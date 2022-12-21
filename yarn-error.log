@@ -1,0 +1,63 @@
+Arguments: 
+  /var/home/dylan/.local/share/virtualenvs/kolibri-dynamic-collections-plugin-1J7WXSi4/bin/node /var/home/dylan/.local/share/virtualenvs/kolibri-dynamic-collections-plugin-1J7WXSi4/bin/yarn install
+
+PATH: 
+  /var/home/dylan/.local/share/virtualenvs/kolibri-dynamic-collections-plugin-1J7WXSi4/lib/node_modules/.bin:/var/home/dylan/.local/share/virtualenvs/kolibri-dynamic-collections-plugin-1J7WXSi4/bin:/var/home/dylan/.local/share/virtualenvs/kolibri-dynamic-collections-plugin-1J7WXSi4/bin:/var/lib/flatpak/exports/bin:/home/dylan/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:^/dev/null
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  10.18.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  SyntaxError: /var/home/dylan/Code/endlessm/kolibri-dynamic-collections-plugin/package.json: Unexpected token } in JSON at position 1028
+      at JSON.parse (<anonymous>)
+      at /var/home/dylan/.local/share/virtualenvs/kolibri-dynamic-collections-plugin-1J7WXSi4/lib/node_modules/yarn/lib/cli.js:1629:59
+      at Generator.next (<anonymous>)
+      at step (/var/home/dylan/.local/share/virtualenvs/kolibri-dynamic-collections-plugin-1J7WXSi4/lib/node_modules/yarn/lib/cli.js:310:30)
+      at /var/home/dylan/.local/share/virtualenvs/kolibri-dynamic-collections-plugin-1J7WXSi4/lib/node_modules/yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "kolibri-dynamic-collections-plugin",
+    "description": "Zim file render plugin for Kolibri",
+    "private": true,
+    "scripts": {
+      "build": "kolibri-tools build prod --plugins kolibri_dynamic_collections_plugin",
+      "bump-version": "bump2version",
+      "clean": "kolibri-tools build clean --plugins kolibri_dynamic_collections_plugin",
+      "dev": "kolibri-tools build dev --plugins kolibri_dynamic_collections_plugin --port 4000",
+      "dist": "run-s clean build && python setup.py bdist_wheel --universal",
+      "lint-frontend:format": "yarn run lint-frontend --write",
+      "lint-frontend": "kolibri-tools lint -p 'kolibri_dynamic_collections_plugin/assets/**/*.{js,vue,scss,less,css}'",
+      "release": "./scripts/check_can_release.sh && twine upload -s dist/*"
+    },
+    "devDependencies": {
+      "kolibri-tools": "0.15.4",
+      "vuex-router-sync": "^5.0.0",
+      "yarn-run-all": "^3.1.1"
+    },
+    "resolutions": {
+      "vuex-router-sync": "^5.0.0",
+      "glob": "^7.0.0",
+      "sockjs-client": "1.5.2",
+      "nopt": "6.0.0",
+    },
+    "engines": {
+      "node": "10.x",
+      "yarn": ">= 1.12.3"
+    },
+    "browserslist": [
+      "extends browserslist-config-kolibri"
+    ]
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

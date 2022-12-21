@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Set up Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '10.24.1'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install wheel
+        yarn global add @vue/cli@v4.5.15
+        yarn install
+
+    - name: Run yarn dist
+      run: yarn dist
+
+    - name: Upload whl artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: kolibri-dynamic-collections-plugin-whl
+        path: dist/kolibri_dynamic_collections_plugin-*.whl

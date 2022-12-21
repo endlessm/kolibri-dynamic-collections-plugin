@@ -1,0 +1,35 @@
+{
+  "name": "kolibri-dynamic-collections-plugin",
+  "description": "Zim file render plugin for Kolibri",
+  "private": true,
+  "scripts": {
+    "build": "kolibri-tools build prod --plugins kolibri_dynamic_collections_plugin",
+    "bump-version": "bump2version",
+    "clean": "kolibri-tools build clean --plugins kolibri_dynamic_collections_plugin",
+    "dev": "kolibri-tools build dev --plugins kolibri_dynamic_collections_plugin --port 4000",
+    "dist": "run-s clean build && python setup.py bdist_wheel --universal",
+    "lint-frontend:format": "yarn run lint-frontend --write",
+    "lint-frontend": "kolibri-tools lint -p 'kolibri_dynamic_collections_plugin/assets/**/*.{js,vue,scss,less,css}'",
+    "release": "./scripts/check_can_release.sh && twine upload -s dist/*"
+  },
+  "devDependencies": {
+    "kolibri-tools": "0.15.4",
+    "vuex-router-sync": "^5.0.0",
+    "yarn-run-all": "^3.1.1"
+  },
+  "resolutions": {
+    "vuex-router-sync": "^5.0.0",
+    "glob": "^7.0.0",
+    "sockjs-client": "1.5.2",
+    "nopt": "^5.0.0",
+    "expect": "^24.0.0",
+    "pretty-format": "^26.0.0"
+  },
+  "engines": {
+    "node": "10.x",
+    "yarn": ">= 1.12.3"
+  },
+  "browserslist": [
+    "extends browserslist-config-kolibri"
+  ]
+}
