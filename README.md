@@ -1,7 +1,9 @@
-# Kolibri Dynamic Collections Editor plugin
+# Kolibri Dynamic Collections plugin
 
-This is a Kolibri plugin to edit dynamic collections, which are a new way to
-bundle together content across multiple Kolibri channels.
+This is a Kolibri plugin for dynamic collections, which are a new way to
+bundle together content across multiple Kolibri channels. The plugin includes
+database models and utilities to manage dynamic collections, as well as an
+editor to create collections from a selection of channels and content nodes.
 
 ## Usage
 
