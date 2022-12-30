@@ -1,8 +1,8 @@
 <template>
 
   <CoreBase
-    :appBarTitle="$tr('collectionsAppBarTitle')"
-    :toolbarTitle="$tr('collectionsAppBarTitle')"
+    :appBarTitle="$tr('collectionAppBarTitle')"
+    :toolbarTitle="$tr('collectionAppBarTitle')"
     :immersivePage="false"
     :showSubNav="false"
   >
@@ -85,6 +85,7 @@
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import CoreTable from 'kolibri.coreVue.components.CoreTable';
   import commonCoreStrings from 'kolibri.coreVue.mixins.commonCoreStrings';
+  import { PageNames } from '../constants';
 
   const EXPORT_OPTION = 'EXPORT';
   const RESET_OPTION = 'RESET';
@@ -97,14 +98,13 @@
     },
     mixins: [commonCoreStrings],
     computed: {
-      ...mapGetters(['channelDetails']),
-      ...mapState({ collectionEditorData: 'collectionEditorData' }),
+      ...mapGetters('collectionContent', ['channelDetails']),
+      ...mapState('collectionContent', ['collectionEditorData']),
       collectionName() {
         const metadata = this.collectionEditorData.metadata;
         return `${metadata.description} - ${metadata.subtitle} - ${metadata.title}`;
       },
       dropdownOptions() {
-        console.log("dropdownOptions computed")
         return [
           { label: this.$tr('exportButtonLabel'), value: EXPORT_OPTION },
           { label: this.$tr('resetButtonLabel'), value: RESET_OPTION },
@@ -117,6 +117,10 @@
       },
       onEditClicked(channelId) {
         console.log("Edit button clicked", channelId);
+        this.$router.push({
+          name: PageNames.COLLECTION_EDITOR_CHANNEL,
+          params: {channelId},
+        });
       },
       onRemoveClicked(channelId) {
         console.log("Remove button clicked", channelId);
@@ -134,7 +138,7 @@
         message: 'Add Channel',
         context: 'Label for the Add Channel button.',
       },
-      collectionsAppBarTitle: {
+      collectionAppBarTitle: {
         message: 'Dynamic Collections',
         context: 'App bar title for the collections plugin',
       },
@@ -170,15 +174,15 @@
 
 <style lang="scss" scoped>
 
-  .collection-actions, .channels-table {
-    /* 24px is a magic number used for ".move-down" in some Kolibri core plugins */
-    margin-top: 24px;
-  }
-
   .collection-header {
     p {
       margin-bottom: 0;
     }
+  }
+
+  .collection-actions, .channels-table {
+    /* 24px is a magic number used for ".move-down" in some Kolibri core plugins */
+    margin-top: 24px;
   }
 
 </style>
