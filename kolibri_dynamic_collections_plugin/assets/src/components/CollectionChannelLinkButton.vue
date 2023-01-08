@@ -1,11 +1,22 @@
 <template>
 
   <KButton
+    v-if="channelIsAvailable"
     appearance="basic-link"
-    :text="channelTitle"
-    :disabled="!channelIsAvailable"
+    class="channel-edit-button"
     icon="library"
-    @click="onButtonClicked"
+    :text="channelObject.title"
+    @click="onLabelButtonClicked"
+  />
+  <KExternalLink
+    v-else
+    appearance="basic-link"
+    class="channel-download-button"
+    icon="download"
+    :text="$tr('unknownChannelTitle', {channelId})"
+    :title="$tr('importChannelButtonTooltip')"
+    :href="importUrl"
+    :openInNewTab="true"
   />
 
 </template>
@@ -13,6 +24,7 @@
 
 <script>
 
+  import urls from 'kolibri.urls';
   import { PageNames } from '../constants';
 
   export default {
@@ -37,19 +49,38 @@
       channelIsAvailable() {
         return Boolean(this.channelObject);
       },
+      importUrl() {
+        // TODO: Instead of navigating to this page, we should run the
+        //       importchannel task directly and show a progress bar.
+        const urlFn = urls['kolibri:kolibri.plugins.device:device_management'];
+        if (!urlFn) {
+          return null;
+        }
+        return `${urlFn()}#/content/channels/${this.channelId}`;
+
+      }
     },
     methods: {
-      onButtonClicked() {
+      onLabelButtonClicked() {
         this.$router.push({
           name: PageNames.COLLECTION_EDITOR_CHANNEL,
           params: {channelId: this.channelId},
         });
       },
+      onDownloadButtonClicked() {
+        this.$router.push({
+
+        });
+      }
     },
     $trs: {
       unknownChannelTitle: {
         message: '({channelId})',
         context: 'Placeholder title for an unknown channel',
+      },
+      importChannelButtonTooltip: {
+        message: 'Import missing channel',
+        context: 'Tooltip for a button to import missing content'
       },
     },
   };
@@ -58,16 +89,5 @@
 
 
 <style lang="scss" scoped>
-
-  .collection-header {
-    p {
-      margin-bottom: 0;
-    }
-  }
-
-  .collection-actions, .channels-table {
-    /* 24px is a magic number used for ".move-down" in some Kolibri core plugins */
-    margin-top: 24px;
-  }
 
 </style>
