@@ -51,7 +51,7 @@
         <template #headers>
           <th>Channel</th>
           <th>Items</th>
-          <th>Size (MB)</th>
+          <th>Size</th>
           <th>
             <span class="visuallyhidden">
               {{ coreString('userActionsColumnHeader') }}
@@ -68,7 +68,7 @@
                 />
               </td>
               <td>{{ $formatNumber(channelSelections.nodesCount) }}</td>
-              <td>{{ $formatNumber(bytesToMB(channelSelections.size)) }}</td>
+              <td>{{ $formatNumber(bytesToMB(channelSelections.size)) }} MB</td>
               <td class="core-table-button-col">
                 <KButton
                   appearance="flat-button"
@@ -88,7 +88,7 @@
 
 <script>
 
-  import { mapGetters, mapState } from 'vuex';
+  import { mapActions, mapGetters, mapState } from 'vuex';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import CoreTable from 'kolibri.coreVue.components.CoreTable';
   import commonCoreStrings from 'kolibri.coreVue.mixins.commonCoreStrings';
@@ -121,11 +121,12 @@
       },
     },
     methods: {
+      ...mapActions('collectionBase', ['removeChannel']),
       onAddChannelClicked() {
         console.log('AddChannel button clicked');
       },
       onRemoveClicked(channelId) {
-        console.log('Remove button clicked', channelId);
+        this.removeChannel({ channelId });
       },
       onOptionsDropdownSelected({ value }) {
         if (value === EXPORT_OPTION) {

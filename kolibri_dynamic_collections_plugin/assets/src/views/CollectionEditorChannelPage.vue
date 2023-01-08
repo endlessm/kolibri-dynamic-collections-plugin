@@ -21,10 +21,10 @@
             <span class="visuallyhidden">
               Selected
             </span>
-            <KCheckbox
-              :checked="isSelectAllChecked"
-              :indeterminate="isSelectAllIndeterminate"
-              @change="onSelectAllToggled"
+            <CollectionContentNodeCheckbox
+              :contentNode="topic"
+              :includeNodeIds="includeNodeIds"
+              @toggle="onCollectionContentNodeCheckboxToggled"
             />
           </th>
           <th class="content-node-thumbnail-column">
@@ -34,16 +34,17 @@
           </th>
           <th>Title</th>
           <th class="content-node-size-column">
-            Size (MB)
+            Size
           </th>
         </template>
         <template #tbody>
           <tbody>
             <tr v-for="node in children" :key="node.id">
               <td>
-                <KCheckbox
-                  :checked="false"
-                  @change="onSelectAllToggled"
+                <CollectionContentNodeCheckbox
+                  :contentNode="node"
+                  :includeNodeIds="includeNodeIds"
+                  @toggle="onCollectionContentNodeCheckboxToggled"
                 />
               </td>
               <td>
@@ -65,7 +66,7 @@
                   <span>{{ node.title }}</span>
                 </template>
               </td>
-              <td>{{ $formatNumber(bytesToMB(node.total_file_size)) }}</td>
+              <td>{{ $formatNumber(bytesToMB(node.total_file_size)) }} MB</td>
             </tr>
           </tbody>
         </template>
@@ -78,21 +79,24 @@
 
 <script>
 
-  import { mapState } from 'vuex';
+  import { mapActions, mapState } from 'vuex';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import CoreTable from 'kolibri.coreVue.components.CoreTable';
   import commonCoreStrings from 'kolibri.coreVue.mixins.commonCoreStrings';
   import dynamicCollectionsUtilsMixin from '../mixins/dynamicCollectionsUtilsMixin';
   import { PageNames } from '../constants';
+  import CollectionContentNodeCheckbox from '../components/CollectionContentNodeCheckbox';
 
   export default {
     name: 'CollectionEditorChannelPage',
     components: {
       CoreBase,
       CoreTable,
+      CollectionContentNodeCheckbox,
     },
     mixins: [commonCoreStrings, dynamicCollectionsUtilsMixin],
     computed: {
+      ...mapState('collectionBase', ['collectionEditorData']),
       ...mapState('collectionChannel', ['channel', 'topic', 'children']),
       channelId() {
         return this.$route.params.channelId;
@@ -100,14 +104,22 @@
       channelName() {
         return this.channel.title;
       },
+      collectionEditorDataForChannel() {
+        return (
+          this.collectionEditorData.channels.find(
+            channelData => channelData.id === this.channelId
+          ) || {}
+        );
+      },
+      includeNodeIds() {
+        if (this.collectionEditorDataForChannel.include_node_ids === undefined) {
+          return [this.channelId];
+        } else {
+          return this.collectionEditorDataForChannel.include_node_ids;
+        }
+      },
       immersivePageRoute() {
         return this.$router.getRoute(PageNames.COLLECTION_EDITOR_OVERVIEW);
-      },
-      isSelectAllChecked() {
-        return false;
-      },
-      isSelectAllIndeterminate() {
-        return false;
       },
       breadcrumbItems() {
         if (!this.topic.ancestors) {
@@ -126,6 +138,7 @@
       },
     },
     methods: {
+      ...mapActions('collectionBase', ['setNodeIncluded']),
       getTopicRoute(channelId, topicId) {
         if (topicId && topicId !== channelId) {
           return this.$router.getRoute(PageNames.COLLECTION_EDITOR_CHANNEL_TOPIC, {
@@ -141,8 +154,12 @@
       onTopicLinkClicked(channelId, topicId) {
         this.$router.push(this.getTopicRoute(channelId, topicId));
       },
-      onSelectAllToggled(value) {
-        console.log('Select All toggled', value);
+      onCollectionContentNodeCheckboxToggled({ nodeId, included }) {
+        this.setNodeIncluded({
+          channelId: this.channelId,
+          nodeId,
+          included,
+        });
       },
     },
     $trs: {

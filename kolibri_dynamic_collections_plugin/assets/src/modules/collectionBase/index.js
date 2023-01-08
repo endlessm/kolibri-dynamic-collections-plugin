@@ -207,7 +207,9 @@ export default {
     RESET_STATE(state) {
       Object.assign(state, defaultState());
     },
-    SET_STATE() {},
+    SET_STATE(state, payload) {
+      state.collectionEditorData = payload.collectionEditorData || {};
+    },
   },
   getters: {
     channelSelectionsList(state) {
@@ -217,6 +219,37 @@ export default {
         nodesCount: channel.include_node_ids.length,
         size: 0,
       }));
+    },
+  },
+  actions: {
+    removeChannel(store, { channelId }) {
+      const collectionEditorData = {
+        ...store.state.collectionEditorData,
+        channels: store.state.collectionEditorData.channels.filter(
+          channelData => channelData.id !== channelId
+        ),
+      };
+      store.commit('SET_STATE', { collectionEditorData });
+    },
+    setNodeIncluded(store, { channelId, nodeId, included }) {
+      const collectionEditorData = Object.assign({}, store.state.collectionEditorData, {
+        channels: store.state.collectionEditorData.channels.map(channelData => {
+          if (channelData.id === channelId) {
+            const includeNodeIds = new Set(channelData.include_node_ids);
+            if (included) {
+              includeNodeIds.add(nodeId);
+            } else {
+              includeNodeIds.delete(nodeId);
+            }
+            return Object.assign({}, channelData, {
+              include_node_ids: Array.from(includeNodeIds),
+            });
+          } else {
+            return channelData;
+          }
+        }),
+      });
+      store.commit('SET_STATE', { collectionEditorData });
     },
   },
 };
