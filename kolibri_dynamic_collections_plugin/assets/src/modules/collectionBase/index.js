@@ -197,8 +197,6 @@ const DEFAULT_EDITOR_DATA = {
 function defaultState() {
   return {
     collectionEditorData: DEFAULT_EDITOR_DATA,
-    channel: {},
-    topic: {},
   };
 }
 
@@ -206,13 +204,13 @@ export default {
   namespaced: true,
   state: defaultState(),
   mutations: {
-    SET_STATE(state, payload) {
-      state.channel = payload.channel || {};
-      state.topic = payload.topic || {};
+    RESET_STATE(state) {
+      Object.assign(state, defaultState());
     },
+    SET_STATE() {},
   },
   getters: {
-    channelDetails(state) {
+    channelSelectionsList(state) {
       return state.collectionEditorData.channels.map(channel => ({
         id: channel.id,
         name: channel.id,
