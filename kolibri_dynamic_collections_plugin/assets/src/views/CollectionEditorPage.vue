@@ -42,7 +42,7 @@
         <template #headers>
           <th>Channel</th>
           <th>Items</th>
-          <th>Size</th>
+          <th>Size (MB)</th>
           <th>
             <span class="visuallyhidden">
               {{ coreString('userActionsColumnHeader') }}
@@ -51,22 +51,20 @@
         </template>
         <template #tbody>
           <tbody>
-            <tr v-for="channel in channelDetails" :key="channel.id">
+            <tr v-for="channelSelections in channelSelectionsList" :key="channelSelections.id">
               <td>
-                <KButton
-                  appearance="basic-link"
-                  :text="channel.id"
-                  icon="library"
-                  @click="onEditClicked(channel.id)"
+                <CollectionChannelLinkButton
+                  :channelId="channelSelections.id"
+                  @click="onEditClicked(channelSelections.id)"
                 />
               </td>
-              <td>{{ $formatNumber(channel.nodesCount) }}</td>
-              <td>{{ $formatNumber(channel.size) }}</td>
+              <td>{{ $formatNumber(channelSelections.nodesCount) }}</td>
+              <td>{{ $formatNumber(bytesToMB(channelSelections.size)) }}</td>
               <td class="core-table-button-col">
                 <KButton
                   appearance="flat-button"
                   :text="$tr('removeButtonLabel')"
-                  @click="onRemoveClicked(channel.id)"
+                  @click="onRemoveClicked(channelSelections.id)"
                 />
               </td>
             </tr>
@@ -85,7 +83,8 @@
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import CoreTable from 'kolibri.coreVue.components.CoreTable';
   import commonCoreStrings from 'kolibri.coreVue.mixins.commonCoreStrings';
-  import { PageNames } from '../constants';
+  import dynamicCollectionsUtilsMixin from '../mixins/dynamicCollectionsUtilsMixin';
+  import CollectionChannelLinkButton from '../components/CollectionChannelLinkButton';
 
   const EXPORT_OPTION = 'EXPORT';
   const RESET_OPTION = 'RESET';
@@ -95,11 +94,12 @@
     components: {
       CoreBase,
       CoreTable,
+      CollectionChannelLinkButton,
     },
-    mixins: [commonCoreStrings],
+    mixins: [commonCoreStrings, dynamicCollectionsUtilsMixin],
     computed: {
-      ...mapGetters('collectionContent', ['channelDetails']),
-      ...mapState('collectionContent', ['collectionEditorData']),
+      ...mapGetters('collectionBase', ['channelSelectionsList']),
+      ...mapState('collectionBase', ['collectionEditorData']),
       collectionName() {
         const metadata = this.collectionEditorData.metadata;
         return `${metadata.description} - ${metadata.subtitle} - ${metadata.title}`;
@@ -115,13 +115,6 @@
       onAddChannelClicked() {
         console.log("AddChannel button clicked");
       },
-      onEditClicked(channelId) {
-        console.log("Edit button clicked", channelId);
-        this.$router.push({
-          name: PageNames.COLLECTION_EDITOR_CHANNEL,
-          params: {channelId},
-        });
-      },
       onRemoveClicked(channelId) {
         console.log("Remove button clicked", channelId);
       },
@@ -131,7 +124,11 @@
         } else if (value === RESET_OPTION) {
           console.log("Reset button clicked");
         }
-      }
+      },
+      getChannelTitle(channelId) {
+        const channel = this.$store.getters['getChannelObject'](channelId);
+        return channel ? channel.title : undefined;
+      },
     },
     $trs: {
       addChannelButtonLabel: {

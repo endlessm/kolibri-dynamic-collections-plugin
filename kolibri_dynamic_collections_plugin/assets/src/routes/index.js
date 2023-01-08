@@ -1,7 +1,8 @@
 import store from 'kolibri.coreVue.vuex.store';
 import CollectionEditorPage from '../views/CollectionEditorPage';
 import CollectionEditorChannelPage from '../views/CollectionEditorChannelPage';
-import { showCollection, showCollectionChannel } from '../modules/collectionContent/handlers';
+import { showCollection } from '../modules/collectionBase/handlers';
+import { showCollectionChannel } from '../modules/collectionChannel/handlers';
 import { PageNames } from '../constants';
 
 export default [
@@ -21,7 +22,17 @@ export default [
     handler(toRoute, fromRoute) {
       const {channelId} = toRoute.params;
       store.commit('SET_PAGE_NAME', PageNames.COLLECTION_EDITOR_CHANNEL);
-      showCollectionChannel(store, channelId);
+      showCollectionChannel(store, { channelId });
+    },
+  },
+  {
+    name: PageNames.COLLECTION_EDITOR_CHANNEL_TOPIC,
+    path: '/editor/:channelId/:topicId',
+    component: CollectionEditorChannelPage,
+    handler(toRoute, fromRoute) {
+      const {channelId, topicId} = toRoute.params;
+      store.commit('SET_PAGE_NAME', PageNames.COLLECTION_EDITOR_CHANNEL);
+      showCollectionChannel(store, { channelId, topicId });
     },
   },
   {
@@ -30,7 +41,7 @@ export default [
     // Redirect to CollectionEditorPage
     beforeEnter(to, from, next) {
       store.commit('SET_PAGE_NAME', PageNames.ROOT);
-      next({ name: 'CollectionEditorPage', replace: true });
+      next({ name: PageNames.COLLECTION_EDITOR_OVERVIEW, replace: true });
     },
   },
 ];
