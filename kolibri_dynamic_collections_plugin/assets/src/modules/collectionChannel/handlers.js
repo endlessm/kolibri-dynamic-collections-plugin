@@ -1,5 +1,5 @@
-import { ContentNodeResource } from 'kolibri.resources';
 import samePageCheckGenerator from 'kolibri.utils.samePageCheckGenerator';
+import { AllContentNodeResource } from '../../api-resources';
 import { normalizeContentNode } from '../coreCollections/utils';
 
 export function showCollectionChannel(store, { channelId, topicId }) {
@@ -12,17 +12,19 @@ export function showCollectionChannel(store, { channelId, topicId }) {
   // TODO: We need a custom ContentNodeResource that includes unavailable content.
 
   return Promise.all([
-    ContentNodeResource.fetchModel({ id: channelId }),
-    ContentNodeResource.fetchModel({ id: topicId }),
-    ContentNodeResource.fetchCollection({ getParams: { parent: topicId } }),
+    AllContentNodeResource.fetchModel({ id: channelId }),
+    topicId !== channelId ? AllContentNodeResource.fetchModel({ id: topicId }) : Promise.resolve(),
+    AllContentNodeResource.fetchCollection({ getParams: { parent: topicId } }),
     store.dispatch('setAllChannelInfo'),
   ]).then(
-    ([rootNode, topic, children]) => {
+    ([rootNode, topicNode, childNodes]) => {
+      topicNode = topicNode || rootNode;
+
       if (shouldResolve()) {
         store.commit('collectionChannel/SET_STATE', {
           channel: store.getters.getChannelObject(rootNode.channel_id),
-          topic: normalizeContentNode(topic),
-          children: children.map(normalizeContentNode),
+          topic: normalizeContentNode(topicNode),
+          children: childNodes.map(normalizeContentNode),
         });
 
         store.commit('CORE_SET_PAGE_LOADING', false);
