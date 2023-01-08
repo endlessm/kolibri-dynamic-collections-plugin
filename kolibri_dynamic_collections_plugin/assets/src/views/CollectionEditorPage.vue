@@ -49,7 +49,6 @@
       CoreTable,
     },
     mixins: [commonCoreStrings],
-    computed: {},
     $trs: {
       collectionsAppBarTitle: {
         message: 'Dynamic Collections',
@@ -63,7 +62,3 @@
   };
 
 </script>
-
-
-<style lang="scss" scoped></style>
-

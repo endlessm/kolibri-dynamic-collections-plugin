@@ -2,12 +2,10 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from kolibri.core.content import hooks as content_hooks
 from kolibri.core.hooks import NavigationHook
 from kolibri.core.webpack import hooks as webpack_hooks
 from kolibri.plugins import KolibriPluginBase
 from kolibri.plugins.hooks import register_hook
-from le_utils.constants import format_presets
 
 
 class DynamicCollectionsPlugin(KolibriPluginBase):
