@@ -3,7 +3,7 @@
   <CoreMenuOption
     :label="$tr('navLabel')"
     :link="url"
-    icon="coach"
+    icon="dashboard"
   />
 
 </template>
