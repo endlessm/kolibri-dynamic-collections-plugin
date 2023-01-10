@@ -240,13 +240,31 @@ export default {
         channel => ({
           id: channel.id,
           name: channel.id,
-          nodesCount: channel.include_node_ids.length,
+          nodesCount: 0,
           size: 0,
         })
       );
     },
   },
   actions: {
+    // TODO: Can we use a proper immutable object library here?
+    addChannels(store, {channelIds}) {
+      const collectionEditorData = {
+        ...store.state.collectionEditorData,
+        channels: [
+          ...store.state.collectionEditorData.channels,
+          ...channelIds.map(
+            // TODO: Add channel version
+            channelId => ({
+              id: channelId,
+              include_node_ids: undefined,
+              version: 0
+            })
+          )
+        ]
+      };
+      store.commit('SET_STATE', {collectionEditorData});
+    },
     removeChannel(store, {channelId}) {
       const collectionEditorData = {
         ...store.state.collectionEditorData,
