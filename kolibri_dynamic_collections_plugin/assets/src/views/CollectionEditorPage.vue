@@ -41,7 +41,7 @@
               :text="$tr('addChannelButtonLabel')"
               :primary="true"
               :style="{ marginLeft: 0 }"
-              @click="onAddChannelClicked"
+              @click="showAddChannelModal = true"
             />
           </KButtonGroup>
         </KGridItem>
@@ -60,20 +60,20 @@
         </template>
         <template #tbody>
           <tbody>
-            <tr v-for="channelSelections in channelSelectionsList" :key="channelSelections.id">
+            <tr v-for="channel in channelSelectionsList" :key="channel.id">
               <td>
                 <CollectionChannelLinkButton
-                  :channelId="channelSelections.id"
-                  @click="onEditClicked(channelSelections.id)"
+                  :channelId="channel.id"
+                  @click="onEditClicked(channel.id)"
                 />
               </td>
-              <td>{{ $formatNumber(channelSelections.nodesCount) }}</td>
-              <td>{{ $formatNumber(bytesToMB(channelSelections.size)) }} MB</td>
+              <td>{{ $formatNumber(channel.nodesCount) }}</td>
+              <td>{{ $formatNumber(bytesToMB(channel.size)) }} MB</td>
               <td class="core-table-button-col">
                 <KButton
                   appearance="flat-button"
                   :text="$tr('removeButtonLabel')"
-                  @click="onRemoveClicked(channelSelections.id)"
+                  @click="onRemoveClicked(channel.id)"
                 />
               </td>
             </tr>
@@ -81,6 +81,13 @@
         </template>
       </CoreTable>
     </KPageContainer>
+
+    <AddChannelModal
+      v-if="showAddChannelModal"
+      :existingChannels="channelSelectionsList.map(channel => channel.id)"
+      @submit="onAddChannelModalSubmit"
+      @cancel="showAddChannelModal = false"
+    />
   </CoreBase>
 
 </template>
@@ -94,6 +101,7 @@
   import commonCoreStrings from 'kolibri.coreVue.mixins.commonCoreStrings';
   import dynamicCollectionsUtilsMixin from '../mixins/dynamicCollectionsUtilsMixin';
   import CollectionChannelLinkButton from '../components/CollectionChannelLinkButton';
+  import AddChannelModal from '../components/AddChannelModal';
 
   const EXPORT_OPTION = 'EXPORT';
   const RESET_OPTION = 'RESET';
@@ -101,11 +109,17 @@
   export default {
     name: 'CollectionEditorPage',
     components: {
+      AddChannelModal,
       CoreBase,
       CoreTable,
       CollectionChannelLinkButton,
     },
     mixins: [commonCoreStrings, dynamicCollectionsUtilsMixin],
+    data() {
+      return {
+        showAddChannelModal: false,
+      };
+    },
     computed: {
       ...mapGetters('collectionBase', ['channelSelectionsList']),
       ...mapState('collectionBase', ['collectionEditorData']),
@@ -121,9 +135,10 @@
       },
     },
     methods: {
-      ...mapActions('collectionBase', ['removeChannel']),
-      onAddChannelClicked() {
-        console.log('AddChannel button clicked');
+      ...mapActions('collectionBase', ['addChannels', 'removeChannel']),
+      onAddChannelModalSubmit({ channelIds }) {
+        this.addChannels({ channelIds });
+        this.showAddChannelModal = false;
       },
       onRemoveClicked(channelId) {
         this.removeChannel({ channelId });
