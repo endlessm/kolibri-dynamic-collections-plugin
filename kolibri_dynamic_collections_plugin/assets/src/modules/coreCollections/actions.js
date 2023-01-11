@@ -19,6 +19,11 @@ function _channelListState(data) {
   }));
 }
 
+export function resetCollectionEditorState(store) {
+  store.commit('collectionBase/RESET_STATE');
+  store.commit('collectionChannel/RESET_STATE');
+}
+
 export function setAllChannelInfo(store) {
   return ChannelResource.fetchCollection({ getParams: {} }).then(
     channelsData => {
