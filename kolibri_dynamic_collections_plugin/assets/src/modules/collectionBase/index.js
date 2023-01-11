@@ -223,6 +223,16 @@ export default {
   },
   actions: {
     // TODO: Can we use a proper immutable object library here?
+    setMetadata(store, { metadata }) {
+      const collectionEditorData = {
+        ...store.state.collectionEditorData,
+        metadata: {
+          ...store.state.collectionEditorData.metadata,
+          ...metadata,
+        },
+      };
+      store.commit('SET_STATE', { collectionEditorData });
+    },
     addChannels(store, { channelIds }) {
       const collectionEditorData = {
         ...store.state.collectionEditorData,
