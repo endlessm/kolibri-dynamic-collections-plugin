@@ -10,15 +10,21 @@
       <KGrid>
         <KGridItem class="collection-header" :layout8="{ span: 4 }" :layout12="{ span: 6 }">
           <h1>{{ $tr('editorHeader') }}</h1>
-          <p>
-            {{ collectionName }}
-            <KButton
-              appearance="basic-link"
-              icon="edit"
-              :title="$tr('renameButtonLabel')"
-              :ariaLabel="$tr('renameButtonLabel')"
-            />
-          </p>
+          <div class="collection-info-grid">
+            <div class="collection-info-main">
+              <span v-if="collectionName" class="collection-name">{{ collectionName }}</span>
+              <span v-else class="collection-name-untitled">{{ $tr('untitledCollectionLabel') }}</span>
+            </div>
+            <div class="collection-info-edit">
+              <KButton
+                appearance="basic-link"
+                icon="edit"
+                :title="$tr('renameButtonLabel')"
+                :ariaLabel="$tr('renameButtonLabel')"
+                @click="showEditCollectionMetadataModal = true"
+              />
+            </div>
+          </div>
         </KGridItem>
         <KGridItem class="collection-actions" :layout="{ alignment: 'right' }" :layout8="{ span: 4 }" :layout12="{ span: 6 }">
           <KButtonGroup>
@@ -79,6 +85,13 @@
       @submit="onAddChannelModalSubmit"
       @cancel="showAddChannelModal = false"
     />
+
+    <EditCollectionMetadataModal
+      v-if="showEditCollectionMetadataModal"
+      :defaultMetadata="collectionEditorData.metadata"
+      @submit="onEditCollectionMetadataModalSubmit"
+      @cancel="showEditCollectionMetadataModal = false"
+    />
   </CoreBase>
 
 </template>
@@ -93,6 +106,7 @@
   import dynamicCollectionsUtilsMixin from '../mixins/dynamicCollectionsUtilsMixin';
   import CollectionChannelLinkButton from '../components/CollectionChannelLinkButton';
   import AddChannelModal from '../components/AddChannelModal';
+  import EditCollectionMetadataModal from '../components/EditCollectionMetadataModal';
 
   const EXPORT_OPTION = 'EXPORT';
   const RESET_OPTION = 'RESET';
@@ -104,19 +118,25 @@
       CoreBase,
       CoreTable,
       CollectionChannelLinkButton,
+      EditCollectionMetadataModal,
     },
     mixins: [commonCoreStrings, dynamicCollectionsUtilsMixin],
     data() {
       return {
         showAddChannelModal: false,
+        showEditCollectionMetadataModal: false,
       };
     },
     computed: {
       ...mapGetters('collectionBase', ['channelSelectionsList']),
       ...mapState('collectionBase', ['collectionEditorData']),
       collectionName() {
-        const metadata = this.collectionEditorData.metadata;
-        return `${metadata.description} - ${metadata.subtitle} - ${metadata.title}`;
+        const {title, subtitle, description} = this.collectionEditorData.metadata;
+        if (title && subtitle && description) {
+          return `${description} - ${subtitle} - ${title}`;
+        } else {
+          return undefined;
+        }
       },
       dropdownOptions() {
         return [
@@ -126,10 +146,14 @@
       },
     },
     methods: {
-      ...mapActions('collectionBase', ['addChannels', 'removeChannel']),
+      ...mapActions('collectionBase', ['addChannels', 'removeChannel', 'setMetadata']),
       onAddChannelModalSubmit({ channelIds }) {
         this.addChannels({channelIds});
         this.showAddChannelModal = false;
+      },
+      onEditCollectionMetadataModalSubmit({ metadata }) {
+        this.setMetadata({metadata})
+        this.showEditCollectionMetadataModal = false;
       },
       onRemoveClicked(channelId) {
         this.removeChannel({channelId});
@@ -159,6 +183,10 @@
         message: 'Collection',
         context: 'Title of the Collections Editor page.',
       },
+      untitledCollectionLabel: {
+        message: 'Untitled',
+        context: 'Label for an untitled collection',
+      },
       editButtonLabel: {
         message: 'Edit',
         context: 'Label for the Edit button.',
@@ -187,9 +215,19 @@
 
 <style lang="scss" scoped>
 
-  .collection-header {
-    p {
-      margin-bottom: 0;
+  @import '~kolibri-design-system/lib/styles/definitions';
+  @import '~kolibri-design-system/lib/keen/styles/imports';
+
+  .collection-info-grid {
+    display: flex;
+    flex-direction: row;
+
+    .collection-name-untitled {
+      font-style: italic;
+    }
+
+    .collection-info-main {
+      margin-right: 8px;
     }
   }
 
