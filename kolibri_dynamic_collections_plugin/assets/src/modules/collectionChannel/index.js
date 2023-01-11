@@ -17,7 +17,7 @@ export default {
       state.channel = payload.channel || {};
       state.topic = payload.topic || {};
       state.children = payload.children || [];
-    }
+    },
   },
   getters: {},
 };
