@@ -138,6 +138,14 @@
           return undefined;
         }
       },
+      downloadFileName() {
+        const {description, subtitle} = this.collectionEditorData.metadata;
+        if (description && subtitle) {
+          return `${description.toLowerCase()}-${subtitle.toLowerCase()}.json`;
+        } else {
+          return `collection.json`;
+        }
+      },
       dropdownOptions() {
         return [
           { label: this.$tr('exportButtonLabel'), value: EXPORT_OPTION },
@@ -148,6 +156,17 @@
     methods: {
       ...mapActions(['resetCollectionEditorState']),
       ...mapActions('collectionBase', ['addChannels', 'removeChannel', 'setMetadata']),
+      exportAsJSON() {
+        // TODO: Instead of creating a blob here, add an API endpoint which
+        //       returns a JSON file and window.open() that.
+        const dataStr = JSON.stringify(this.collectionEditorData, null, 2);
+        const blob = new Blob([dataStr], { type: 'text/plain;charset=utf-8' });
+        const linkElem = document.createElement('a');
+        linkElem.href = URL.createObjectURL(blob);
+        linkElem.download = this.downloadFileName;
+        linkElem.click();
+        URL.revokeObjectURL(linkElem.href);
+      },
       onAddChannelModalSubmit({ channelIds }) {
         this.addChannels({channelIds});
         this.showAddChannelModal = false;
@@ -161,7 +180,7 @@
       },
       onOptionsDropdownSelected({ value }) {
         if (value === EXPORT_OPTION) {
-          console.log("Export button clicked");
+          this.exportAsJSON();
         } else if (value === RESET_OPTION) {
           this.resetCollectionEditorState();
         }
