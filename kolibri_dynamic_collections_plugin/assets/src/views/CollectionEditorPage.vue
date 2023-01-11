@@ -146,6 +146,7 @@
       },
     },
     methods: {
+      ...mapActions(['resetCollectionEditorState']),
       ...mapActions('collectionBase', ['addChannels', 'removeChannel', 'setMetadata']),
       onAddChannelModalSubmit({ channelIds }) {
         this.addChannels({channelIds});
@@ -162,7 +163,7 @@
         if (value === EXPORT_OPTION) {
           console.log("Export button clicked");
         } else if (value === RESET_OPTION) {
-          console.log("Reset button clicked");
+          this.resetCollectionEditorState();
         }
       },
       getChannelTitle(channelId) {

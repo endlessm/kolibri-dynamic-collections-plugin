@@ -34,6 +34,9 @@ export default {
   },
   actions: {
     // TODO: Can we use a proper immutable object library here?
+    resetState(store) {
+      store.commit('RESET_STATE');
+    },
     setMetadata(store, {metadata}) {
       const collectionEditorData = {
         ...store.state.collectionEditorData,
