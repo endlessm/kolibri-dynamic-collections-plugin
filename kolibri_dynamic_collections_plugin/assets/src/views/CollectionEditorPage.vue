@@ -7,12 +7,8 @@
     :showSubNav="false"
   >
     <KPageContainer>
-      <KGrid>
-        <KGridItem
-          class="collection-header"
-          :layout8="{ span: 4 }"
-          :layout12="{ span: 6 }"
-        >
+      <KGrid v-if="collectionEditorData">
+        <KGridItem class="collection-header" :layout8="{ span: 4 }" :layout12="{ span: 6 }">
           <h1>{{ $tr('editorHeader') }}</h1>
           <div class="collection-info-grid">
             <div class="collection-info-main">
@@ -57,7 +53,7 @@
         </KGridItem>
       </KGrid>
 
-      <CoreTable class="channels-table">
+      <CoreTable v-if="channelSelectionsList.length > 0" class="channels-table">
         <template #headers>
           <th>Channel</th>
           <th>Items</th>
@@ -90,6 +86,21 @@
           </tbody>
         </template>
       </CoreTable>
+      <div v-else class="empty-collection-form">
+        <p>
+          <label for="json-file"> {{ $tr('fileInputLabel') }}</label>
+        </p>
+        <p>
+          <input
+            id="json-file"
+            ref="fileInput"
+            type="file"
+            accept=".json"
+            name="json-file"
+            @change="onFileInputChange"
+          >
+        </p>
+      </div>
     </KPageContainer>
 
     <AddChannelModal
@@ -168,7 +179,12 @@
     },
     methods: {
       ...mapActions(['resetCollectionEditorState']),
-      ...mapActions('collectionBase', ['addChannels', 'removeChannel', 'setMetadata']),
+      ...mapActions('collectionBase', [
+        'setCollectionEditorDataFromFile',
+        'addChannels',
+        'removeChannel',
+        'setMetadata',
+      ]),
       exportAsJSON() {
         // TODO: Instead of creating a blob here, add an API endpoint which
         //       returns a JSON file and window.open() that.
@@ -198,6 +214,15 @@
           this.resetCollectionEditorState();
         }
       },
+      onFileInputChange(event) {
+        event.preventDefault();
+        // TODO: This should be in an action.
+        const file = this.$refs.fileInput.files[0];
+        if (!file) {
+          return;
+        }
+        this.setCollectionEditorDataFromFile({ file });
+      },
     },
     $trs: {
       addChannelButtonLabel: {
@@ -215,6 +240,10 @@
       untitledCollectionLabel: {
         message: 'Untitled',
         context: 'Label for an untitled collection',
+      },
+      fileInputLabel: {
+        message: 'Start adding channels, or upload an existing collection manifest.',
+        context: 'Label for the file input form',
       },
       exportButtonLabel: {
         message: 'Export',
@@ -257,9 +286,14 @@
   }
 
   .collection-actions,
-  .channels-table {
+  .channels-table,
+  .empty-collection-form {
     /* 24px is a magic number used for ".move-down" in some Kolibri core plugins */
     margin-top: 24px;
+  }
+
+  .empty-collection-form {
+    border-top: solid $ui-input-border-width $ui-input-border-color;
   }
 
 </style>

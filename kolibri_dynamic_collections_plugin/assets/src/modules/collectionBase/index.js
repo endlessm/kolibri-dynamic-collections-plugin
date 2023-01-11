@@ -35,6 +35,19 @@ export default {
     resetState(store) {
       store.commit('RESET_STATE');
     },
+    setCollectionEditorDataFromFile(store, { file }) {
+      return file.text().then(fileText => {
+        let collectionEditorData = undefined;
+        try {
+          collectionEditorData = JSON.parse(fileText);
+        } catch (error) {
+          console.log('Error reading JSON file', error);
+        }
+        if (collectionEditorData) {
+          store.commit('SET_STATE', { collectionEditorData });
+        }
+      });
+    },
     setMetadata(store, { metadata }) {
       const collectionEditorData = {
         ...store.state.collectionEditorData,
