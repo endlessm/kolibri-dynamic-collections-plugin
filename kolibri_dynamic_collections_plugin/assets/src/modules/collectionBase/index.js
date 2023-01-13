@@ -45,8 +45,12 @@ export default {
         channel_list_hash: '',
       };
     },
-    selectedChannelIds(state) {
-      return Object.keys(state.selectedChannels);
+    selectedChannelIds(state, getters, rootState) {
+      // We use allChannels here because it is in a consistent order.
+      const allChannels = rootState.core.channels.list;
+      return allChannels
+        .map(channel => channel.id)
+        .filter(channelId => channelId in state.selectedChannels);
     },
   },
   actions: {
