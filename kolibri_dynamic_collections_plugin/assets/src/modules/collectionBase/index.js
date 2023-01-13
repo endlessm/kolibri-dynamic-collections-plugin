@@ -97,10 +97,12 @@ export default {
     },
     addChannels(store, { channels }) {
       const selectedChannels = { ...store.state.selectedChannels };
+      const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
       for (const channel of channels) {
         selectedChannels[channel.id] = channel.version;
+        selectedNodeIdsByChannel[channel.id] = [channel.id];
       }
-      store.commit('SET_STATE', { ...store.state, selectedChannels });
+      store.commit('SET_STATE', { ...store.state, selectedChannels, selectedNodeIdsByChannel });
     },
     removeChannel(store, { channelId }) {
       const selectedChannels = { ...store.state.selectedChannels };

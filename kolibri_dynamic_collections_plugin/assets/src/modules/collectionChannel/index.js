@@ -3,6 +3,7 @@ function defaultState() {
     channel: {},
     topic: {},
     children: [],
+    selectionRanges: [],
   };
 }
 
@@ -19,5 +20,9 @@ export default {
       state.children = payload.children || [];
     },
   },
-  getters: {},
+  getters: {
+    selectedNodeIds(state, getters, rootState) {
+      return rootState.collectionBase.selectedNodeIdsByChannel[state.channel.id] || [];
+    },
+  },
 };
