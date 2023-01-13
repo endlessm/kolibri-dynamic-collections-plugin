@@ -5,6 +5,7 @@
     :indeterminate="isNodeIndeterminate"
     :title="$tr('checkboxTooltip')"
     :disabled="!isNodeEnabled"
+    :style="{ marginTop: 0, marginBottom: 0 }"
     @change="onNodeCheckboxToggled"
   />
 
@@ -22,7 +23,7 @@
         type: Object,
         required: true,
       },
-      includeNodeIds: {
+      selectedNodeIds: {
         type: Array,
         required: true,
       },
@@ -38,7 +39,7 @@
         // TODO: Instead of doing this locally, update AllContentNodeViewset
         //       to accept a content manifest as request payload and annotate
         //       results to describe whether nodes are included.
-        if (this.includeNodeIds === undefined) {
+        if (this.selectedNodeIds === undefined) {
           return true;
         }
         return this.getNodeEnabled(this.nodeId) || this.ancestorNodeIds.some(this.getNodeEnabled);
@@ -57,7 +58,7 @@
     },
     methods: {
       getNodeEnabled(nodeId) {
-        return this.includeNodeIds.indexOf(nodeId) >= 0;
+        return this.selectedNodeIds.indexOf(nodeId) >= 0;
       },
       onNodeCheckboxToggled(value) {
         this.$emit('toggle', {

@@ -1,11 +1,9 @@
-const DEFAULT_EDITOR_DATA = {
-  channels: [],
-  metadata: {},
-};
-
 function defaultState() {
   return {
-    collectionEditorData: DEFAULT_EDITOR_DATA,
+    collectionMetadata: {},
+    selectedChannels: {},
+    selectedNodeIdsByChannel: {},
+    contentTags: {},
   };
 }
 
@@ -17,17 +15,38 @@ export default {
       Object.assign(state, defaultState());
     },
     SET_STATE(state, payload) {
-      state.collectionEditorData = payload.collectionEditorData || {};
+      state.collectionMetadata = payload.collectionMetadata || {};
+      state.selectedChannels = payload.selectedChannels || {};
+      state.selectedNodeIdsByChannel = payload.selectedNodeIdsByChannel || {};
+      state.contentTags = payload.contentTags || {};
     },
   },
   getters: {
-    channelSelectionsList(state) {
-      return state.collectionEditorData.channels.map(channel => ({
-        id: channel.id,
-        name: channel.id,
-        nodesCount: 0,
-        size: 0,
-      }));
+    collectionDataObject(state) {
+      const channelsList = [];
+
+      for (const [channelId, channelVersion] of Object.entries(state.selectedChannels)) {
+        const nodeIds = state.selectedNodeIdsByChannel[channelId];
+        channelsList.push({
+          id: channelId,
+          version: channelVersion,
+          include_node_ids: nodeIds,
+        });
+      }
+
+      // TODO: Can we calculate channel_list_hash the same way as on the
+      //       server? Or should we move this functionality to the server
+      //       anyway?
+
+      return {
+        channels: channelsList,
+        content_tags: state.contentTags,
+        metadata: state.collectionMetadata,
+        channel_list_hash: '',
+      };
+    },
+    selectedChannelIds(state) {
+      return Object.keys(state.selectedChannels);
     },
   },
   actions: {
@@ -37,72 +56,67 @@ export default {
     },
     setCollectionEditorDataFromFile(store, { file }) {
       return file.text().then(fileText => {
-        let collectionEditorData = undefined;
+        let dataObject = undefined;
         try {
-          collectionEditorData = JSON.parse(fileText);
+          dataObject = JSON.parse(fileText);
         } catch (error) {
           console.log('Error reading JSON file', error);
         }
-        if (collectionEditorData) {
-          store.commit('SET_STATE', { collectionEditorData });
+        if (!dataObject) {
+          return;
         }
+        store.dispatch('setCollectionEditorDataFromObject', { dataObject });
       });
     },
-    setMetadata(store, { metadata }) {
-      const collectionEditorData = {
-        ...store.state.collectionEditorData,
-        metadata: {
-          ...store.state.collectionEditorData.metadata,
-          ...metadata,
-        },
-      };
-      store.commit('SET_STATE', { collectionEditorData });
+    setCollectionEditorDataFromObject(store, { dataObject }) {
+      const selectedChannels = {};
+      const selectedNodeIdsByChannel = {};
+
+      for (const channel of dataObject.channels) {
+        // TODO: Report error (and provide migration options) on mismatched channel versions
+        const existingVersion = selectedChannels[channel.id];
+        if (existingVersion === undefined || channel.id > existingVersion) {
+          selectedChannels[channel.id] = channel.version;
+          selectedNodeIdsByChannel[channel.id] = channel.include_node_ids;
+        }
+      }
+
+      store.commit('SET_STATE', {
+        collectionMetadata: dataObject.metadata,
+        selectedChannels,
+        selectedNodeIdsByChannel,
+        contentTags: dataObject.content_tags,
+      });
     },
-    addChannels(store, { channelIds }) {
-      const collectionEditorData = {
-        ...store.state.collectionEditorData,
-        channels: [
-          ...store.state.collectionEditorData.channels,
-          ...channelIds.map(
-            // TODO: Add channel version
-            channelId => ({
-              id: channelId,
-              include_node_ids: undefined,
-              version: 0,
-            })
-          ),
-        ],
-      };
-      store.commit('SET_STATE', { collectionEditorData });
+    setCollectionMetadata(store, { collectionMetadata }) {
+      store.commit('SET_STATE', { ...store.state, collectionMetadata });
+    },
+    addChannels(store, { channels }) {
+      const selectedChannels = { ...store.state.selectedChannels };
+      for (const channel of channels) {
+        selectedChannels[channel.id] = channel.version;
+      }
+      store.commit('SET_STATE', { ...store.state, selectedChannels });
     },
     removeChannel(store, { channelId }) {
-      const collectionEditorData = {
-        ...store.state.collectionEditorData,
-        channels: store.state.collectionEditorData.channels.filter(
-          channelData => channelData.id !== channelId
-        ),
-      };
-      store.commit('SET_STATE', { collectionEditorData });
+      const selectedChannels = { ...store.state.selectedChannels };
+      const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
+      delete selectedChannels[channelId];
+      delete selectedNodeIdsByChannel[channelId];
+      store.commit('SET_STATE', { ...store.state, selectedChannels, selectedNodeIdsByChannel });
     },
     setNodeIncluded(store, { channelId, nodeId, included }) {
-      const collectionEditorData = Object.assign({}, store.state.collectionEditorData, {
-        channels: store.state.collectionEditorData.channels.map(channelData => {
-          if (channelData.id === channelId) {
-            const includeNodeIds = new Set(channelData.include_node_ids);
-            if (included) {
-              includeNodeIds.add(nodeId);
-            } else {
-              includeNodeIds.delete(nodeId);
-            }
-            return Object.assign({}, channelData, {
-              include_node_ids: Array.from(includeNodeIds),
-            });
-          } else {
-            return channelData;
-          }
-        }),
-      });
-      store.commit('SET_STATE', { collectionEditorData });
+      const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
+
+      const channelNodeIds = new Set(selectedNodeIdsByChannel[channelId]);
+      if (included) {
+        channelNodeIds.add(nodeId);
+      } else {
+        channelNodeIds.delete(nodeId);
+      }
+      selectedNodeIdsByChannel[channelId] = Array.from(channelNodeIds);
+
+      store.commit('SET_STATE', { ...store.state, selectedNodeIdsByChannel });
     },
   },
 };

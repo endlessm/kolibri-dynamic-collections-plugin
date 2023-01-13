@@ -7,7 +7,7 @@
     :showSubNav="false"
   >
     <KPageContainer>
-      <KGrid v-if="collectionEditorData">
+      <KGrid>
         <KGridItem class="collection-header" :layout8="{ span: 4 }" :layout12="{ span: 6 }">
           <h1>{{ $tr('editorHeader') }}</h1>
           <div class="collection-info-grid">
@@ -53,7 +53,7 @@
         </KGridItem>
       </KGrid>
 
-      <CoreTable v-if="channelSelectionsList.length > 0" class="channels-table">
+      <CoreTable v-if="selectedChannelIds.length > 0" class="channels-table">
         <template #headers>
           <th>Channel</th>
           <th>Items</th>
@@ -66,20 +66,20 @@
         </template>
         <template #tbody>
           <tbody>
-            <tr v-for="channel in channelSelectionsList" :key="channel.id">
+            <tr v-for="channelId in selectedChannelIds" :key="channelId">
               <td>
                 <CollectionChannelLinkButton
-                  :channelId="channel.id"
-                  @click="onEditClicked(channel.id)"
+                  :channelId="channelId"
+                  @click="onEditClicked(channelId)"
                 />
               </td>
-              <td>{{ $formatNumber(channel.nodesCount) }}</td>
-              <td>{{ $formatNumber(bytesToMB(channel.size)) }} MB</td>
+              <td>{{ $formatNumber(0) }}</td>
+              <td>{{ $formatNumber(bytesToMB(0)) }} MB</td>
               <td class="core-table-button-col">
                 <KButton
                   appearance="flat-button"
                   :text="$tr('removeButtonLabel')"
-                  @click="onRemoveClicked(channel.id)"
+                  @click="onRemoveClicked(channelId)"
                 />
               </td>
             </tr>
@@ -105,14 +105,14 @@
 
     <AddChannelModal
       v-if="showAddChannelModal"
-      :existingChannels="channelSelectionsList.map(channel => channel.id)"
+      :existingChannels="selectedChannelIds"
       @submit="onAddChannelModalSubmit"
       @cancel="showAddChannelModal = false"
     />
 
     <EditCollectionMetadataModal
       v-if="showEditCollectionMetadataModal"
-      :defaultMetadata="collectionEditorData.metadata"
+      :defaultMetadata="collectionMetadata"
       @submit="onEditCollectionMetadataModalSubmit"
       @cancel="showEditCollectionMetadataModal = false"
     />
@@ -152,10 +152,10 @@
       };
     },
     computed: {
-      ...mapGetters('collectionBase', ['channelSelectionsList']),
-      ...mapState('collectionBase', ['collectionEditorData']),
+      ...mapState('collectionBase', ['collectionMetadata']),
+      ...mapGetters('collectionBase', ['collectionDataObject', 'selectedChannelIds']),
       collectionName() {
-        const { title, subtitle, description } = this.collectionEditorData.metadata;
+        const { title, subtitle, description } = this.collectionMetadata;
         if (title && subtitle && description) {
           return `${description} - ${subtitle} - ${title}`;
         } else {
@@ -163,7 +163,7 @@
         }
       },
       downloadFileName() {
-        const { description, subtitle } = this.collectionEditorData.metadata;
+        const { description, subtitle } = this.collectionMetadata;
         if (description && subtitle) {
           return `${description.toLowerCase()}-${subtitle.toLowerCase()}.json`;
         } else {
@@ -183,12 +183,12 @@
         'setCollectionEditorDataFromFile',
         'addChannels',
         'removeChannel',
-        'setMetadata',
+        'setCollectionMetadata',
       ]),
       exportAsJSON() {
         // TODO: Instead of creating a blob here, add an API endpoint which
         //       returns a JSON file and window.open() that.
-        const dataStr = JSON.stringify(this.collectionEditorData, null, 2);
+        const dataStr = JSON.stringify(this.collectionDataObject, null, 2);
         const blob = new Blob([dataStr], { type: 'text/plain;charset=utf-8' });
         const linkElem = document.createElement('a');
         linkElem.href = URL.createObjectURL(blob);
@@ -196,12 +196,12 @@
         linkElem.click();
         URL.revokeObjectURL(linkElem.href);
       },
-      onAddChannelModalSubmit({ channelIds }) {
-        this.addChannels({ channelIds });
+      onAddChannelModalSubmit({ channels }) {
+        this.addChannels({ channels });
         this.showAddChannelModal = false;
       },
       onEditCollectionMetadataModalSubmit({ metadata }) {
-        this.setMetadata({ metadata });
+        this.setCollectionMetadata({ collectionMetadata: metadata });
         this.showEditCollectionMetadataModal = false;
       },
       onRemoveClicked(channelId) {

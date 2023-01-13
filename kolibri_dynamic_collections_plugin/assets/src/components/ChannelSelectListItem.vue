@@ -71,7 +71,7 @@
         event.stopPropagation();
       },
       onChannelCheckboxChange(selected, event) {
-        this.$emit('toggle', { channelId: this.channel.id, selected });
+        this.$emit('toggle', { channel: this.channel, selected });
         event.stopPropagation();
       },
     },

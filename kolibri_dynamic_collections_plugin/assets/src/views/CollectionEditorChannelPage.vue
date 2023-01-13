@@ -23,7 +23,7 @@
             </span>
             <CollectionContentNodeCheckbox
               :contentNode="topic"
-              :includeNodeIds="includeNodeIds"
+              :selectedNodeIds="selectedNodeIds"
               @toggle="onCollectionContentNodeCheckboxToggled"
             />
           </th>
@@ -43,7 +43,7 @@
               <td>
                 <CollectionContentNodeCheckbox
                   :contentNode="node"
-                  :includeNodeIds="includeNodeIds"
+                  :selectedNodeIds="selectedNodeIds"
                   @toggle="onCollectionContentNodeCheckboxToggled"
                 />
               </td>
@@ -96,7 +96,7 @@
     },
     mixins: [commonCoreStrings, dynamicCollectionsUtilsMixin],
     computed: {
-      ...mapState('collectionBase', ['collectionEditorData']),
+      ...mapState('collectionBase', ['selectedNodeIdsByChannel']),
       ...mapState('collectionChannel', ['channel', 'topic', 'children']),
       channelId() {
         return this.$route.params.channelId;
@@ -104,19 +104,9 @@
       channelName() {
         return this.channel.title;
       },
-      collectionEditorDataForChannel() {
-        return (
-          this.collectionEditorData.channels.find(
-            channelData => channelData.id === this.channelId
-          ) || {}
-        );
-      },
-      includeNodeIds() {
-        if (this.collectionEditorDataForChannel.include_node_ids === undefined) {
-          return [this.channelId];
-        } else {
-          return this.collectionEditorDataForChannel.include_node_ids;
-        }
+      selectedNodeIds() {
+        const nodeIds = this.selectedNodeIdsByChannel[this.channelId];
+        return nodeIds === undefined ? [this.channelId] : nodeIds;
       },
       immersivePageRoute() {
         return this.$router.getRoute(PageNames.COLLECTION_EDITOR_OVERVIEW);

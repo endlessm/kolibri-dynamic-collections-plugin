@@ -52,12 +52,12 @@
     },
     methods: {
       onModalSubmit() {
-        this.$emit('submit', { channelIds: this.selectedChannels });
+        this.$emit('submit', { channels: this.selectedChannels });
       },
-      onChannelToggle({ channelId, selected }) {
-        const index = this.selectedChannels.indexOf(channelId);
+      onChannelToggle({ channel, selected }) {
+        const index = this.selectedChannels.indexOf(channel);
         if (selected && index < 0) {
-          this.selectedChannels.push(channelId);
+          this.selectedChannels.push(channel);
         } else if (!selected && index >= 0) {
           this.selectedChannels.splice(index, 1);
         }
