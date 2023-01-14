@@ -1,23 +1,32 @@
 <template>
 
-  <KButton
-    v-if="channelIsAvailable"
-    appearance="basic-link"
-    class="channel-edit-button"
-    icon="library"
-    :text="channelObject.title"
-    @click="onLabelButtonClicked"
-  />
-  <KExternalLink
-    v-else
-    appearance="basic-link"
-    class="channel-download-button"
-    icon="download"
-    :text="$tr('unknownChannelTitle', { channelId })"
-    :title="$tr('importChannelButtonTooltip')"
-    :href="importUrl"
-    :openInNewTab="true"
-  />
+  <tr>
+    <td>
+      <KRouterLink
+        v-if="channel"
+        appearance="basic-link"
+        class="channel-edit-button"
+        icon="library"
+        :text="channel.title"
+        :to="collectionChannelPage"
+      />
+      <KExternalLink
+        v-else
+        appearance="basic-link"
+        class="channel-download-button"
+        icon="download"
+        :text="$tr('unknownChannelTitle', { channelId })"
+        :title="$tr('importChannelButtonTooltip')"
+        :href="channelImportUrl"
+        :openInNewTab="true"
+      />
+    </td>
+    <td>{{ $formatNumber(0) }}</td>
+    <td>{{ $formatNumber(bytesToMB(0)) }} MB</td>
+    <td class="core-table-button-col">
+      <slot name="actions"></slot>
+    </td>
+  </tr>
 
 </template>
 
@@ -26,11 +35,11 @@
 
   import urls from 'kolibri.urls';
   import { PageNames } from '../constants';
+  import dynamicCollectionsUtilsMixin from '../mixins/dynamicCollectionsUtilsMixin';
 
   export default {
-    name: 'CollectionChannelLinkButton',
-    components: {},
-    mixins: [],
+    name: 'CollectionChannelTableRow',
+    mixins: [dynamicCollectionsUtilsMixin],
     props: {
       channelId: {
         type: String,
@@ -38,13 +47,10 @@
       },
     },
     computed: {
-      channelObject() {
+      channel() {
         return this.$store.getters['getChannelObject'](this.channelId);
       },
-      channelIsAvailable() {
-        return Boolean(this.channelObject);
-      },
-      importUrl() {
+      channelImportUrl() {
         // TODO: Instead of navigating to this page, we should run the
         //       importchannel task directly and show a progress bar.
         const urlFn = urls['kolibri:kolibri.plugins.device:device_management'];
@@ -53,13 +59,11 @@
         }
         return `${urlFn()}#/content/channels/${this.channelId}`;
       },
-    },
-    methods: {
-      onLabelButtonClicked() {
-        this.$router.push({
+      collectionChannelPage() {
+        return {
           name: PageNames.COLLECTION_EDITOR_CHANNEL,
           params: { channelId: this.channelId },
-        });
+        };
       },
     },
     $trs: {
@@ -75,3 +79,12 @@
   };
 
 </script>
+
+
+<style lang="scss" scoped>
+
+  .core-table-button-col {
+    width: 0;
+  }
+
+</style>

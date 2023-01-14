@@ -45,12 +45,24 @@ export default {
         channel_list_hash: '',
       };
     },
+    downloadFileName(state) {
+      const { description, subtitle } = state.collectionMetadata;
+      if (description && subtitle) {
+        return `${description.toLowerCase()}-${subtitle.toLowerCase()}.json`;
+      } else {
+        return `collection.json`;
+      }
+    },
     selectedChannelIds(state, getters, rootState) {
-      // We use allChannels here because it is in a consistent order.
       const allChannels = rootState.core.channels.list;
-      return allChannels
+      // We use allChannels here so known channels appear in a consistent order.
+      const existingChannelIds = allChannels
         .map(channel => channel.id)
         .filter(channelId => channelId in state.selectedChannels);
+      const extraChannelIds = Object.keys(state.selectedChannels)
+        .filter(channelId => !existingChannelIds.includes(channelId))
+        .sort();
+      return [...existingChannelIds, ...extraChannelIds];
     },
   },
   actions: {
