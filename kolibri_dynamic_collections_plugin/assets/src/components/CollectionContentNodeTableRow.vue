@@ -10,6 +10,17 @@
         class="content-node-thumbnail"
         :src="thumbnailUrl"
       >
+      <LearningActivityIcon
+        v-else-if="isLeaf"
+        class="content-node-thumbnail"
+        :kind="learningActivities"
+      />
+      <KIcon
+        v-else
+        class="content-node-thumbnail"
+        icon="topic"
+        :color="$themePalette.grey.v_500"
+      />
     </td>
     <td>
       <template v-if="!isLeaf">
@@ -54,11 +65,16 @@
 <script>
 
   import urls from 'kolibri.urls';
+  import { getContentNodeThumbnail } from 'kolibri.utils.contentNode';
   import dynamicCollectionsUtilsMixin from '../mixins/dynamicCollectionsUtilsMixin';
   import { PageNames } from '../constants';
+  import LearningActivityIcon from './LearningActivityIcon';
 
   export default {
     name: 'CollectionContentNodeTableRow',
+    components: {
+      LearningActivityIcon,
+    },
     mixins: [dynamicCollectionsUtilsMixin],
     props: {
       contentNode: {
@@ -85,8 +101,11 @@
       title() {
         return this.contentNode.title;
       },
+      learningActivities() {
+        return this.contentNode.learning_activities;
+      },
       thumbnailUrl() {
-        return this.contentNode.thumbnail;
+        return getContentNodeThumbnail(this.contentNode);
       },
       topicNodePage() {
         return {
