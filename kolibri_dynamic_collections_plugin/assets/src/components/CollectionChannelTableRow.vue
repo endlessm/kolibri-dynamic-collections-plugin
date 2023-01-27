@@ -52,6 +52,7 @@
       channelImportUrl() {
         // TODO: Instead of navigating to this page, we should run the
         //       importchannel task directly and show a progress bar.
+        //       <https://phabricator.endlessm.com/T34353>
         const urlFn = urls['kolibri:kolibri.plugins.device:device_management'];
         if (!urlFn) {
           return null;
