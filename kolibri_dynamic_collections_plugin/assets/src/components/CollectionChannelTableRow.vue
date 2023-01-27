@@ -22,7 +22,7 @@
       />
     </td>
     <td>{{ $formatNumber(0) }}</td>
-    <td>{{ $formatNumber(bytesToMB(0)) }} MB</td>
+    <td>{{ bytesText }}</td>
     <td class="core-table-button-col">
       <slot name="actions"></slot>
     </td>
@@ -34,12 +34,11 @@
 <script>
 
   import urls from 'kolibri.urls';
+  import bytesForHumans from 'kolibri.utils.bytesForHumans';
   import { PageNames } from '../constants';
-  import dynamicCollectionsUtilsMixin from '../mixins/dynamicCollectionsUtilsMixin';
 
   export default {
     name: 'CollectionChannelTableRow',
-    mixins: [dynamicCollectionsUtilsMixin],
     props: {
       channelId: {
         type: String,
@@ -64,6 +63,10 @@
           name: PageNames.COLLECTION_EDITOR_CHANNEL,
           params: { channelId: this.channelId },
         };
+      },
+      bytesText() {
+        // TODO: Calculate the collection size in bytes.
+        return bytesForHumans(0);
       },
     },
     $trs: {
