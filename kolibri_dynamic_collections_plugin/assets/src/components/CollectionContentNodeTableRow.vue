@@ -56,7 +56,7 @@
         </div>
       </template>
     </td>
-    <td>{{ $formatNumber(bytesToMB(contentNode.total_file_size)) }} MB</td>
+    <td>{{ bytesText }}</td>
   </tr>
 
 </template>
@@ -66,7 +66,7 @@
 
   import urls from 'kolibri.urls';
   import { getContentNodeThumbnail } from 'kolibri.utils.contentNode';
-  import dynamicCollectionsUtilsMixin from '../mixins/dynamicCollectionsUtilsMixin';
+  import bytesForHumans from 'kolibri.utils.bytesForHumans';
   import { PageNames } from '../constants';
   import LearningActivityIcon from './LearningActivityIcon';
 
@@ -75,7 +75,6 @@
     components: {
       LearningActivityIcon,
     },
-    mixins: [dynamicCollectionsUtilsMixin],
     props: {
       contentNode: {
         type: Object,
@@ -128,6 +127,9 @@
           return null;
         }
         return `${urlFn()}#/content/channels/${this.channelId}?node_id=${this.topicId}`;
+      },
+      bytesText() {
+        return bytesForHumans(this.contentNode.total_file_size);
       },
     },
     $trs: {
