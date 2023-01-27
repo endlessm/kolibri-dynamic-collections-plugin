@@ -1,12 +1,12 @@
-import { setChannelInfo } from 'kolibri.coreVue.vuex.actions';
 import PageRoot from 'kolibri.coreVue.components.PageRoot';
 import KolibriApp from 'kolibri_app';
+import { setAllChannelInfo } from './modules/coreCollections/actions';
 import routes from './routes';
 import pluginModule from './modules/pluginModule';
 
 class DynamicCollectionsModule extends KolibriApp {
   get stateSetters() {
-    return [setChannelInfo];
+    return [setAllChannelInfo];
   }
   get routes() {
     return routes;

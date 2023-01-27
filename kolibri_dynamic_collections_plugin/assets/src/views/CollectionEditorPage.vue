@@ -1,36 +1,84 @@
 <template>
 
   <CoreBase
-    :appBarTitle="$tr('collectionsAppBarTitle')"
-    :toolbarTitle="$tr('collectionsAppBarTitle')"
+    :appBarTitle="$tr('collectionAppBarTitle')"
+    :toolbarTitle="$tr('collectionAppBarTitle')"
     :immersivePage="false"
     :showSubNav="false"
   >
     <KPageContainer>
-      <h1>{{ $tr('editorHeader') }}</h1>
-      <CoreTable>
-        <template #headers>
-          <th>Channels</th>
-          <th>Content nodes</th>
+      <EditorPageHeader :title="$tr('editorHeader')">
+        <template #subtitle>
+          <span v-if="collectionName" class="collection-name">{{ collectionName }}</span>
+          <span v-else class="collection-name-untitled">{{ $tr('untitledCollectionLabel') }}</span>
+          <KButton
+            appearance="basic-link"
+            icon="edit"
+            :style="{ marginLeft: '8px' }"
+            :title="$tr('renameButtonLabel')"
+            :ariaLabel="$tr('renameButtonLabel')"
+            @click="showEditCollectionMetadataModal = true"
+          />
         </template>
-        <template #tbody>
-          <tbody>
-            <tr>
-              <td>
-                Channel 1
-              </td>
-              <td>
-                <ul>
-                  <li>Content node 1</li>
-                  <li>Content node 2</li>
-                  <li>Content node 3</li>
-                </ul>
-              </td>
-            </tr>
-          </tbody>
+        <template #actions>
+          <KButtonGroup>
+            <CollectionEditorOptionsMenu
+              @exportOptionSelect="exportCollectionEditorData"
+              @resetOptionSelect="resetCollectionEditorState"
+            />
+            <KButton
+              :text="$tr('addChannelButtonLabel')"
+              :primary="true"
+              :style="{ marginLeft: 0 }"
+              @click="showAddChannelModal = true"
+            />
+          </KButtonGroup>
         </template>
-      </CoreTable>
+      </EditorPageHeader>
+
+      <CollectionChannelTable
+        v-if="selectedChannelIds.length > 0"
+        class="channels-table"
+        :channelIds="selectedChannelIds"
+      >
+        <template #channelActions="{ channelId }">
+          <KButton
+            appearance="flat-button"
+            :text="$tr('removeButtonLabel')"
+            @click="removeChannel({ channelId })"
+          />
+        </template>
+      </CollectionChannelTable>
+      <div v-else class="empty-collection-form">
+        <p>
+          <label for="json-file"> {{ $tr('fileInputLabel') }}</label>
+        </p>
+        <p>
+          <input
+            id="json-file"
+            ref="fileInput"
+            type="file"
+            accept=".json"
+            name="json-file"
+            @change="onFileInputChange"
+          >
+        </p>
+      </div>
     </KPageContainer>
+
+    <AddChannelModal
+      v-if="showAddChannelModal"
+      :existingChannels="selectedChannelIds"
+      @submit="onAddChannelModalSubmit"
+      @cancel="showAddChannelModal = false"
+    />
+
+    <EditCollectionMetadataModal
+      v-if="showEditCollectionMetadataModal"
+      :defaultMetadata="collectionMetadata"
+      @submit="onEditCollectionMetadataModalSubmit"
+      @cancel="showEditCollectionMetadataModal = false"
+    />
   </CoreBase>
 
 </template>
@@ -38,27 +86,116 @@
 
 <script>
 
+  import { mapActions, mapGetters, mapState } from 'vuex';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
-  import CoreTable from 'kolibri.coreVue.components.CoreTable';
-  import commonCoreStrings from 'kolibri.coreVue.mixins.commonCoreStrings';
+  import CollectionChannelTable from '../components/CollectionChannelTable';
+  import AddChannelModal from '../components/AddChannelModal';
+  import EditorPageHeader from '../components/EditorPageHeader';
+  import CollectionEditorOptionsMenu from '../components/CollectionEditorOptionsMenu';
+  import EditCollectionMetadataModal from '../components/EditCollectionMetadataModal';
 
   export default {
     name: 'CollectionEditorPage',
     components: {
+      AddChannelModal,
       CoreBase,
-      CoreTable,
+      CollectionChannelTable,
+      CollectionEditorOptionsMenu,
+      EditorPageHeader,
+      EditCollectionMetadataModal,
     },
-    mixins: [commonCoreStrings],
+    data() {
+      return {
+        showAddChannelModal: false,
+        showEditCollectionMetadataModal: false,
+      };
+    },
+    computed: {
+      ...mapState('collectionBase', ['collectionMetadata']),
+      ...mapGetters('collectionBase', ['selectedChannelIds']),
+      collectionName() {
+        const { title, subtitle, description } = this.collectionMetadata;
+        if (title && subtitle && description) {
+          return `${description} - ${subtitle} - ${title}`;
+        } else {
+          return undefined;
+        }
+      },
+    },
+    methods: {
+      ...mapActions(['exportCollectionEditorData', 'resetCollectionEditorState']),
+      ...mapActions('collectionBase', [
+        'setCollectionEditorDataFromFile',
+        'addChannels',
+        'removeChannel',
+        'setCollectionMetadata',
+      ]),
+      onAddChannelModalSubmit({ channels }) {
+        this.addChannels({ channels });
+        this.showAddChannelModal = false;
+      },
+      onEditCollectionMetadataModalSubmit({ metadata }) {
+        this.setCollectionMetadata({ collectionMetadata: metadata });
+        this.showEditCollectionMetadataModal = false;
+      },
+      onFileInputChange(event) {
+        event.preventDefault();
+        // TODO: This should be in an action.
+        const file = this.$refs.fileInput.files[0];
+        if (!file) {
+          return;
+        }
+        this.setCollectionEditorDataFromFile({ file });
+      },
+    },
     $trs: {
-      collectionsAppBarTitle: {
+      addChannelButtonLabel: {
+        message: 'Add Channel',
+        context: 'Label for the Add Channel button.',
+      },
+      collectionAppBarTitle: {
         message: 'Dynamic Collections',
         context: 'App bar title for the collections plugin',
       },
       editorHeader: {
         message: 'Collection Editor',
-        context: 'Title of the Collections Editor page.',
+        context: 'Title of the Collection Editor page.',
+      },
+      untitledCollectionLabel: {
+        message: 'Untitled',
+        context: 'Label for an untitled collection',
+      },
+      fileInputLabel: {
+        message: 'Start adding channels, or upload an existing collection manifest.',
+        context: 'Label for the file input form',
+      },
+      removeButtonLabel: {
+        message: 'Remove',
+        context: 'Label for the Remove button.',
+      },
+      renameButtonLabel: {
+        message: 'Rename',
+        context: 'Label for the Rename button.',
       },
     },
   };
 
 </script>
+
+
+<style lang="scss" scoped>
+
+  @import '~kolibri-design-system/lib/styles/definitions';
+  @import '~kolibri-design-system/lib/keen/styles/imports';
+
+  .channels-table,
+  .empty-collection-form {
+    /* 24px is a magic number used for ".move-down" in some Kolibri core plugins */
+    margin-top: 24px;
+  }
+
+  .empty-collection-form {
+    border-top: solid $ui-input-border-width $ui-input-border-color;
+  }
+
+</style>
