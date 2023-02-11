@@ -6,6 +6,6 @@ include README.rst
 include requirements.txt
 recursive-exclude kolibri_dynamic_collections_plugin/* *pyc
 recursive-include kolibri_dynamic_collections_plugin/static *.*
-
 recursive-include kolibri_dynamic_collections_plugin/build *.json
 recursive-exclude kolibri_dynamic_collections_plugin/assets *
+recursive-include kolibri_dynamic_collections_plugin/templates *
