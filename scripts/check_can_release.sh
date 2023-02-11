@@ -3,7 +3,7 @@
 # Check that all is pushed so it's ready to release
 HEAD=$(git rev-parse --verify HEAD)
 TAG=$(git describe --tags)
-MASTER_HASH=$(git ls-remote https://github.com/endlessm/kolibri-dynamic-collections-plugin.git master | cut -f1)
+MASTER_HASH=$(git ls-remote https://github.com/endlessm/kolibri-dynamic-collections-plugin.git main | cut -f1)
 if [ $HEAD != $MASTER_HASH ]
 then
     echo "The repository is not pushed"
