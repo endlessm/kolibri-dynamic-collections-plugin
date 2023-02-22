@@ -32,6 +32,14 @@
       :label="$tr('descriptionLabel')"
       :maxlength="50"
     />
+
+    <KTextbox
+      ref="titleTextbox"
+      v-model.number="required_gigabytes"
+      type="number"
+      :label="$tr('requiredGigabytesLabel')"
+      :min="1"
+    />
   </KModal>
 
 </template>
@@ -55,11 +63,12 @@
         title: this.defaultMetadata.title,
         subtitle: this.defaultMetadata.subtitle,
         description: this.defaultMetadata.description,
+        required_gigabytes: Number(this.defaultMetadata.required_gigabytes),
       };
     },
     computed: {
       isValid() {
-        return this.title && this.subtitle && this.description;
+        return this.title && this.subtitle && this.description && this.required_gigabytes;
       },
     },
     methods: {
@@ -69,6 +78,7 @@
             title: this.title,
             subtitle: this.subtitle,
             description: this.description,
+            required_gigabytes: this.required_gigabytes,
           },
         });
       },
@@ -90,6 +100,9 @@
       },
       descriptionLabel: {
         message: 'Description',
+      },
+      requiredGigabytesLabel: {
+        message: 'Required space (GB)',
       },
     },
   };
