@@ -3,7 +3,7 @@ function defaultState() {
     collectionMetadata: {},
     selectedChannels: {},
     selectedNodeIdsByChannel: {},
-    contentTags: {},
+    externalTagsByNode: {},
   };
 }
 
@@ -18,12 +18,13 @@ export default {
       state.collectionMetadata = payload.collectionMetadata || {};
       state.selectedChannels = payload.selectedChannels || {};
       state.selectedNodeIdsByChannel = payload.selectedNodeIdsByChannel || {};
-      state.contentTags = payload.contentTags || {};
+      state.externalTagsByNode = payload.externalTagsByNode || {};
     },
   },
   getters: {
     collectionDataObject(state) {
       const channelsList = [];
+      const taggedNodeIds = [];
 
       for (const [channelId, channelVersion] of Object.entries(state.selectedChannels)) {
         const nodeIds = state.selectedNodeIdsByChannel[channelId];
@@ -34,14 +35,23 @@ export default {
         });
       }
 
+      for (const [nodeId, tags] of Object.entries(state.externalTagsByNode)) {
+        taggedNodeIds.push({
+          node_id: nodeId,
+          tags: tags,
+        });
+      }
+
       // TODO: Can we calculate channel_list_hash the same way as on the
       //       server? Or should we move this functionality to the server
       //       anyway?
 
       return {
         channels: channelsList,
-        content_tags: state.contentTags,
-        metadata: state.collectionMetadata,
+        metadata: {
+          ...state.collectionMetadata,
+          tagged_node_ids: taggedNodeIds,
+        },
         channel_list_hash: '',
       };
     },
@@ -87,6 +97,8 @@ export default {
     setCollectionEditorDataFromObject(store, { dataObject }) {
       const selectedChannels = {};
       const selectedNodeIdsByChannel = {};
+      const externalTagsByNode = {};
+      const { tagged_node_ids, ...collectionMetadata } = dataObject.metadata;
 
       for (const channel of dataObject.channels) {
         // TODO: Report error (and provide migration options) on mismatched channel versions
@@ -97,11 +109,15 @@ export default {
         }
       }
 
+      for (const { node_id, tags } of tagged_node_ids) {
+        externalTagsByNode[node_id] = tags.slice().sort();
+      }
+
       store.commit('SET_STATE', {
-        collectionMetadata: dataObject.metadata,
+        collectionMetadata,
         selectedChannels,
         selectedNodeIdsByChannel,
-        contentTags: dataObject.content_tags,
+        externalTagsByNode,
       });
     },
     setCollectionMetadata(store, { collectionMetadata }) {
@@ -125,16 +141,23 @@ export default {
     },
     setNodeIncluded(store, { channelId, nodeId, included }) {
       const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
+      const externalTagsByNode = { ...store.state.externalTagsByNode };
 
       const channelNodeIds = new Set(selectedNodeIdsByChannel[channelId]);
       if (included) {
         channelNodeIds.add(nodeId);
       } else {
         channelNodeIds.delete(nodeId);
+        delete externalTagsByNode[nodeId];
       }
       selectedNodeIdsByChannel[channelId] = Array.from(channelNodeIds);
 
-      store.commit('SET_STATE', { ...store.state, selectedNodeIdsByChannel });
+      store.commit('SET_STATE', { ...store.state, externalTagsByNode, selectedNodeIdsByChannel });
+    },
+    setExternalTagsForNode(store, { nodeId, tags }) {
+      const externalTagsByNode = { ...store.state.externalTagsByNode };
+      externalTagsByNode[nodeId] = tags.slice().sort();
+      store.commit('SET_STATE', { ...store.state, externalTagsByNode });
     },
   },
 };

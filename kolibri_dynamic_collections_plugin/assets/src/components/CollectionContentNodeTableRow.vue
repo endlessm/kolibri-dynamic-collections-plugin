@@ -1,10 +1,10 @@
 <template>
 
   <tr>
-    <td>
+    <td class="action-cell">
       <slot name="actions"></slot>
     </td>
-    <td>
+    <td class="thumbnail-cell">
       <img
         v-if="thumbnailUrl"
         class="content-node-thumbnail"
@@ -53,6 +53,9 @@
           >
             {{ $tr('contentNodeUnavailableLabel') }}
           </KExternalLink>
+        </div>
+        <div class="content-node-actions">
+          <slot name="extraActions"></slot>
         </div>
       </template>
     </td>
@@ -158,7 +161,15 @@
 <style lang="scss" scoped>
 
   td {
-    vertical-align: middle;
+    vertical-align: top;
+
+    &.action-cell {
+      padding-top: 20px;
+    }
+
+    &.thumbnail-cell {
+      padding: 16px 8px;
+    }
   }
 
   .content-node-thumbnail {

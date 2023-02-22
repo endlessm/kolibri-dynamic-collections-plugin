@@ -29,6 +29,14 @@
             @toggle="onCollectionContentNodeCheckboxToggled"
           />
         </template>
+        <template #nodeExtraActions="{ contentNode, isAncestorSelected, isSelected }">
+          <CollectionContentNodeExternalTags
+            v-if="isSelected || isAncestorSelected"
+            :contentNode="contentNode"
+            :tags="externalTagsByNode[contentNode.id]"
+            @change="onCollectionContentNodeExternalTagsChange"
+          />
+        </template>
       </CollectionContentNodeTable>
     </KPageContainer>
   </CoreBase>
@@ -42,6 +50,7 @@
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import { PageNames } from '../constants';
   import CollectionContentNodeCheckbox from '../components/CollectionContentNodeCheckbox';
+  import CollectionContentNodeExternalTags from '../components/CollectionContentNodeExternalTags';
   import CollectionContentNodeTable from '../components/CollectionContentNodeTable';
 
   export default {
@@ -49,9 +58,11 @@
     components: {
       CoreBase,
       CollectionContentNodeCheckbox,
+      CollectionContentNodeExternalTags,
       CollectionContentNodeTable,
     },
     computed: {
+      ...mapState('collectionBase', ['externalTagsByNode']),
       ...mapGetters('collectionChannel', ['selectedNodeIds']),
       ...mapState('collectionChannel', ['channel', 'topic', 'children']),
       channelId() {
@@ -80,7 +91,7 @@
       },
     },
     methods: {
-      ...mapActions('collectionBase', ['setNodeIncluded']),
+      ...mapActions('collectionBase', ['setNodeIncluded', 'setExternalTagsForNode']),
       getTopicRoute(channelId, topicId) {
         if (topicId && topicId !== channelId) {
           return this.$router.getRoute(PageNames.COLLECTION_EDITOR_CHANNEL_TOPIC, {
@@ -98,6 +109,12 @@
           channelId: this.channelId,
           nodeId,
           included,
+        });
+      },
+      onCollectionContentNodeExternalTagsChange({ nodeId, tags }) {
+        this.setExternalTagsForNode({
+          nodeId,
+          tags,
         });
       },
     },
