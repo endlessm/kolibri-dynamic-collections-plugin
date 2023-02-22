@@ -6,7 +6,7 @@
         <span class="visuallyhidden">
           {{ $tr('selectedHeader') }}
         </span>
-        <slot name="nodeActions" :contentNode="topic"></slot>
+        <slot name="nodeActions" v-bind="buildContentNodeProps(topic)"></slot>
       </th>
       <th class="content-node-thumbnail-column">
         <span class="visuallyhidden">
@@ -26,7 +26,10 @@
           :contentNode="contentNode"
         >
           <template #actions>
-            <slot name="nodeActions" :contentNode="contentNode"></slot>
+            <slot name="nodeActions" v-bind="buildContentNodeProps(contentNode)"></slot>
+          </template>
+          <template #extraActions>
+            <slot name="nodeExtraActions" v-bind="buildContentNodeProps(contentNode)"></slot>
           </template>
         </CollectionContentNodeTableRow>
       </tbody>
@@ -55,6 +58,28 @@
       children: {
         type: Array,
         default: () => [],
+      },
+      selectedNodeIds: {
+        type: Array,
+        required: true,
+      },
+    },
+    methods: {
+      buildContentNodeProps(contentNode) {
+        return {
+          contentNode,
+          isSelected: this.isNodeSelected(contentNode),
+          isAncestorSelected: this.isNodeAncestorSelected(contentNode),
+        };
+      },
+      isNodeSelected(contentNode) {
+        // TODO: Instead of doing this locally, update AllContentNodeViewset
+        //       to accept a content manifest as request payload and annotate
+        //       results to describe whether nodes are included.
+        return this.selectedNodeIds.indexOf(contentNode.id) >= 0;
+      },
+      isNodeAncestorSelected(contentNode) {
+        return contentNode.ancestors.some(ancestorNode => this.isNodeSelected(ancestorNode));
       },
     },
     $trs: {
