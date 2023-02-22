@@ -27,6 +27,13 @@
             @toggle="onCollectionContentNodeCheckboxToggled"
           />
         </template>
+        <template #nodeExtraActions="{ contentNode, isAncestorSelected, isSelected }">
+          <CollectionContentNodeExternalTags
+            v-if="isSelected || isAncestorSelected"
+            :contentNode="contentNode"
+            @change="onCollectionContentNodeExternalTagsChange"
+          />
+        </template>
       </CollectionContentNodeTable>
     </KPageContainer>
   </CoreBase>
@@ -40,6 +47,7 @@
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import { PageNames } from '../constants';
   import CollectionContentNodeCheckbox from '../components/CollectionContentNodeCheckbox';
+  import CollectionContentNodeExternalTags from '../components/CollectionContentNodeExternalTags';
   import CollectionContentNodeTable from '../components/CollectionContentNodeTable';
 
   export default {
@@ -47,6 +55,7 @@
     components: {
       CoreBase,
       CollectionContentNodeCheckbox,
+      CollectionContentNodeExternalTags,
       CollectionContentNodeTable,
     },
     computed: {
@@ -97,6 +106,8 @@
           nodeId,
           included,
         });
+      },
+      onCollectionContentNodeExternalTagsChange({ nodeId, tags }) {
       },
     },
     $trs: {
