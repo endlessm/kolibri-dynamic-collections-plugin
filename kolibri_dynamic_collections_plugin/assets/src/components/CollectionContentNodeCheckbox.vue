@@ -1,10 +1,10 @@
 <template>
 
   <KCheckbox
-    :checked="isNodeToggled"
-    :indeterminate="isNodeIndeterminate"
+    :checked="isSelected"
+    :indeterminate="isSelectedIndirectly"
+    :class="{ 'selected-indirectly': isSelectedIndirectly }"
     :title="$tr('checkboxTooltip')"
-    :disabled="!isNodeEnabled"
     :style="{ marginTop: 0, marginBottom: 0 }"
     @change="onNodeCheckboxToggled"
   />
@@ -23,43 +23,24 @@
         type: Object,
         required: true,
       },
-      selectedNodeIds: {
-        type: Array,
-        required: true,
+      isSelected: {
+        type: Boolean,
+        default: false,
+      },
+      isAncestorSelected: {
+        type: Boolean,
+        default: false,
       },
     },
     computed: {
       nodeId() {
         return this.contentNode.id;
       },
-      ancestorNodeIds() {
-        return this.contentNode.ancestors.map(node => node.id);
-      },
-      isNodeToggled() {
-        // TODO: Instead of doing this locally, update AllContentNodeViewset
-        //       to accept a content manifest as request payload and annotate
-        //       results to describe whether nodes are included.
-        if (this.selectedNodeIds === undefined) {
-          return true;
-        }
-        return this.getNodeEnabled(this.nodeId) || this.ancestorNodeIds.some(this.getNodeEnabled);
-      },
-      isNodeIndeterminate() {
-        // TODO: If children are selected but not this node, it should appear
-        //       as indeterminate.
-        return false;
-      },
-      isNodeEnabled() {
-        // TODO: If parent node is included, this node is marked as toggled,
-        //       and also disabled. Parent must be explicitly deselected
-        //       first.
-        return !this.ancestorNodeIds.some(this.getNodeEnabled);
+      isSelectedIndirectly() {
+        return this.isAncestorSelected && !this.isSelected;
       },
     },
     methods: {
-      getNodeEnabled(nodeId) {
-        return this.selectedNodeIds.indexOf(nodeId) >= 0;
-      },
       onNodeCheckboxToggled(value) {
         this.$emit('toggle', {
           nodeId: this.nodeId,
@@ -76,3 +57,12 @@
   };
 
 </script>
+
+
+<style lang="scss" scoped>
+
+  .selected-indirectly {
+    opacity: 0.5;
+  }
+
+</style>

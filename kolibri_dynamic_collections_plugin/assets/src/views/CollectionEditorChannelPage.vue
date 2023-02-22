@@ -19,11 +19,13 @@
         class="collection-channel-content"
         :topic="topic"
         :children="children"
+        :selectedNodeIds="selectedNodeIds"
       >
-        <template #nodeActions="{ contentNode }">
+        <template #nodeActions="{ contentNode, isAncestorSelected, isSelected }">
           <CollectionContentNodeCheckbox
             :contentNode="contentNode"
-            :selectedNodeIds="selectedNodeIds"
+            :isSelected="isSelected"
+            :isAncestorSelected="isAncestorSelected"
             @toggle="onCollectionContentNodeCheckboxToggled"
           />
         </template>
