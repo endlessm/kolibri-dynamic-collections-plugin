@@ -31,6 +31,7 @@
           <CollectionContentNodeExternalTags
             v-if="isSelected || isAncestorSelected"
             :contentNode="contentNode"
+            :tags="externalTagsByNode[contentNode.id]"
             @change="onCollectionContentNodeExternalTagsChange"
           />
         </template>
@@ -59,6 +60,7 @@
       CollectionContentNodeTable,
     },
     computed: {
+      ...mapState('collectionBase', ['externalTagsByNode']),
       ...mapGetters('collectionChannel', ['selectedNodeIds']),
       ...mapState('collectionChannel', ['channel', 'topic', 'children']),
       channelId() {
@@ -87,7 +89,7 @@
       },
     },
     methods: {
-      ...mapActions('collectionBase', ['setNodeIncluded']),
+      ...mapActions('collectionBase', ['setNodeIncluded', 'setExternalTagsForNode']),
       getTopicRoute(channelId, topicId) {
         if (topicId && topicId !== channelId) {
           return this.$router.getRoute(PageNames.COLLECTION_EDITOR_CHANNEL_TOPIC, {
@@ -108,6 +110,10 @@
         });
       },
       onCollectionContentNodeExternalTagsChange({ nodeId, tags }) {
+        this.setExternalTagsForNode({
+          nodeId,
+          tags,
+        });
       },
     },
     $trs: {
