@@ -114,9 +114,13 @@
       ...mapState('collectionBase', ['collectionMetadata']),
       ...mapGetters('collectionBase', ['selectedChannelIds']),
       collectionName() {
-        const { title, subtitle, description } = this.collectionMetadata;
+        const { title, subtitle, description, required_gigabytes } = this.collectionMetadata;
         if (title && subtitle && description) {
-          return `${description} - ${subtitle} - ${title}`;
+          if (required_gigabytes) {
+            return `${description} - ${subtitle} - ${title} (${required_gigabytes} GB)`;
+          } else {
+            return `${description} - ${subtitle} - ${title}`;
+          }
         } else {
           return undefined;
         }
