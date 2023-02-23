@@ -128,7 +128,7 @@ export default {
       const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
       for (const channel of channels) {
         selectedChannels[channel.id] = channel.version;
-        selectedNodeIdsByChannel[channel.id] = [channel.id];
+        selectedNodeIdsByChannel[channel.id] = [];
       }
       store.commit('SET_STATE', { ...store.state, selectedChannels, selectedNodeIdsByChannel });
     },
