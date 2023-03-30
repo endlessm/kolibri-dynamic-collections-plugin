@@ -19,11 +19,28 @@ function _channelListState(data) {
   }));
 }
 
+function _sanitize(collectionDataObject) {
+  const existingNodes = collectionDataObject.channels
+    .map((channel) => channel.include_node_ids)
+    .reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
+  const tagsSanitized = collectionDataObject.metadata.tagged_node_ids.filter((tagged) => {
+    if (tagged.tags.length === 0) {
+      return false;
+    }
+    if (!existingNodes.includes(tagged.node_id)) {
+      return false;
+    }
+    return true;
+  });
+  collectionDataObject.metadata.tagged_node_ids = tagsSanitized;
+  return collectionDataObject;
+}
+
 export function exportCollectionEditorData(store) {
   // TODO: Instead of creating a blob here, add an API endpoint which
   //       returns a JSON file and window.open() that.
 
-  const collectionDataObject = store.getters['collectionBase/collectionDataObject'];
+  const collectionDataObject = _sanitize(store.getters['collectionBase/collectionDataObject']);
   const downloadFileName = store.getters['collectionBase/downloadFileName'];
   const dataStr = JSON.stringify(collectionDataObject, null, 2);
 
