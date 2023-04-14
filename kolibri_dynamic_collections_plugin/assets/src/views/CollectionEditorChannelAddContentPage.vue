@@ -47,6 +47,7 @@
 <script>
 
   import { mapActions, mapGetters, mapState } from 'vuex';
+  import bytesForHumans from 'kolibri.utils.bytesForHumans';
   import commonCoreStrings from 'kolibri.coreVue.mixins.commonCoreStrings';
   import BottomAppBar from 'kolibri.coreVue.components.BottomAppBar';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
@@ -65,7 +66,7 @@
     mixins: [commonCoreStrings],
     data() {
       return {
-        addNodeIds: [],
+        addContentNodes: {},
       };
     },
     computed: {
@@ -95,11 +96,21 @@
         ];
         return result;
       },
+      addNodeIds() {
+        return Object.values(this.addContentNodes).map(contentNode => contentNode.id);
+      },
+      selectionSizeText() {
+        const size = Object.values(this.addContentNodes).reduce(
+          (sum, node) => sum + node.total_file_size,
+          0
+        );
+        return bytesForHumans(size);
+      },
       selectionSummaryText() {
         // TODO: Can we include a rough count here?
         //       Maybe break down number of topic and content nodes?
         const count = this.addNodeIds.length;
-        return this.$tr('selectionSummaryText', { count });
+        return this.$tr('selectionSummaryText', { count, size: this.selectionSizeText });
       },
     },
     methods: {
@@ -121,14 +132,16 @@
       onContentNodeNavigate({ nodeId }) {
         this.$router.push(this.getTopicRoute(nodeId));
       },
-      onContentNodeCheckboxToggle({ nodeId, included }) {
-        const addNodeIds = new Set(this.addNodeIds);
+      onContentNodeCheckboxToggle({ contentNode, included }) {
+        const addContentNodes = { ...this.addContentNodes };
+
         if (included) {
-          addNodeIds.add(nodeId);
+          addContentNodes[contentNode.id] = contentNode;
         } else {
-          addNodeIds.delete(nodeId);
+          delete addContentNodes[contentNode.id];
         }
-        this.addNodeIds = Array.from(addNodeIds);
+
+        this.addContentNodes = addContentNodes;
       },
       onSubmitButtonClick() {
         this.addSelectedNodes({
@@ -157,8 +170,9 @@
         context: 'Label for the submit button',
       },
       selectionSummaryText: {
-        message: '{count, number} {count, plural, one {node selected} other {nodes selected}}',
-        context: 'Label identifying the number of nodes that are being added',
+        message:
+          '{count, number} {count, plural, one {item selected} other {items selected}} ({size})',
+        context: 'Label identifying the number of items that are being added',
       },
     },
   };
