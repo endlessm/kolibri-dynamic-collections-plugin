@@ -38,9 +38,6 @@
       },
     },
     computed: {
-      nodeId() {
-        return this.contentNode.id;
-      },
       isSelectedIndirectly() {
         return this.isAncestorSelected && !this.isSelected;
       },
@@ -48,7 +45,7 @@
     methods: {
       onNodeCheckboxToggled(value) {
         this.$emit('toggle', {
-          nodeId: this.nodeId,
+          contentNode: this.contentNode,
           included: value,
         });
       },
