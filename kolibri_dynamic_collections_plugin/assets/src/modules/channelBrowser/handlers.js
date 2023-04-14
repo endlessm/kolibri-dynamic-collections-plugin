@@ -1,6 +1,6 @@
 import samePageCheckGenerator from 'kolibri.utils.samePageCheckGenerator';
 import { AllContentNodeResource } from '../../api-resources';
-import { normalizeContentNode } from '../coreCollections/utils';
+import { loadContentNodeDetails } from '../coreCollections/utils';
 
 export function showChannelBrowser(store, { channelId, topicId }) {
   topicId = topicId || channelId;
@@ -12,15 +12,25 @@ export function showChannelBrowser(store, { channelId, topicId }) {
     AllContentNodeResource.fetchCollection({ getParams: { parent: topicId } }),
     store.dispatch('setAllChannelInfo'),
   ])
+    .then(([topicNode, childNodes]) =>
+      Promise.all([
+        loadContentNodeDetails(topicNode),
+        Promise.all(childNodes.map(loadContentNodeDetails)),
+      ])
+    )
     .then(([topicNode, childNodes]) => {
-      if (shouldResolve()) {
-        store.commit('channelBrowser/SET_STATE', {
-          topic: normalizeContentNode(topicNode),
-          children: childNodes.map(normalizeContentNode),
-        });
+      if (!shouldResolve()) {
+        return;
       }
+      store.commit('channelBrowser/SET_STATE', {
+        topic: topicNode,
+        children: childNodes,
+      });
     })
     .catch(error => {
-      shouldResolve() ? store.dispatch('handleApiError', error) : null;
+      if (!shouldResolve()) {
+        return;
+      }
+      store.dispatch('handleApiError', error);
     });
 }
