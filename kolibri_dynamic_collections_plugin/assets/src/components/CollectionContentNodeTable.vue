@@ -8,12 +8,11 @@
         </span>
         <slot name="nodeActions" v-bind="buildContentNodeProps(topic)"></slot>
       </th>
-      <th class="content-node-thumbnail-column">
+      <th class="content-node-title-column">
         <span class="visuallyhidden">
-          {{ $tr('thumbnailHeader') }}
+          {{ $tr('titleHeader') }}
         </span>
       </th>
-      <th>{{ $tr('titleHeader') }}</th>
       <th class="content-node-size-column">
         {{ $tr('sizeHeader') }}
       </th>
@@ -84,9 +83,6 @@
       selectedHeader: {
         message: 'Selected',
       },
-      thumbnailHeader: {
-        message: 'Thumbnail',
-      },
       titleHeader: {
         message: 'Title',
       },
@@ -109,8 +105,7 @@
     opacity: 0.6;
   }
 
-  .content-node-selected-column,
-  .content-node-thumbnail-column {
+  .content-node-selected-column {
     width: 0;
   }
 
