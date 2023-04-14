@@ -5,21 +5,9 @@
       <slot name="actions"></slot>
     </td>
     <td class="thumbnail-cell">
-      <img
-        v-if="thumbnailUrl"
+      <ContentNodeThumbnail
+        :contentNode="contentNode"
         class="content-node-thumbnail"
-        :src="thumbnailUrl"
-      >
-      <LearningActivityIcon
-        v-else-if="isLeaf"
-        class="content-node-thumbnail"
-        :kind="learningActivities"
-      />
-      <KIcon
-        v-else
-        class="content-node-thumbnail"
-        icon="topic"
-        :color="$themePalette.grey.v_500"
       />
     </td>
     <td>
@@ -68,14 +56,13 @@
 <script>
 
   import urls from 'kolibri.urls';
-  import { getContentNodeThumbnail } from 'kolibri.utils.contentNode';
   import bytesForHumans from 'kolibri.utils.bytesForHumans';
-  import LearningActivityIcon from './LearningActivityIcon';
+  import ContentNodeThumbnail from './ContentNodeThumbnail';
 
   export default {
     name: 'CollectionContentNodeTableRow',
     components: {
-      LearningActivityIcon,
+      ContentNodeThumbnail,
     },
     props: {
       contentNode: {
@@ -101,12 +88,6 @@
       },
       title() {
         return this.contentNode.title;
-      },
-      learningActivities() {
-        return this.contentNode.learning_activities;
-      },
-      thumbnailUrl() {
-        return getContentNodeThumbnail(this.contentNode);
       },
       previewUrl() {
         const urlFn = urls['kolibri:kolibri.plugins.learn:learn'];
@@ -154,7 +135,7 @@
 <style lang="scss" scoped>
 
   td {
-    vertical-align: top;
+    vertical-align: middle;
 
     &.action-cell {
       padding-top: 20px;
@@ -168,7 +149,6 @@
   .content-node-thumbnail {
     width: auto;
     height: 2em;
-    vertical-align: middle;
   }
 
   .content-node-preview {
