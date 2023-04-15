@@ -3,7 +3,7 @@
   <KCheckbox
     :checked="isSelected"
     :disabled="disabled"
-    :indeterminate="isSelectedIndirectly"
+    :indeterminate="isIndeterminate"
     :class="{ 'selected-indirectly': isSelectedIndirectly }"
     :title="$tr('checkboxTooltip')"
     :label="label"
@@ -37,14 +37,21 @@
         type: Boolean,
         default: false,
       },
+      isDescendantSelected: {
+        type: Boolean,
+        default: false,
+      },
       isAncestorSelected: {
         type: Boolean,
         default: false,
       },
     },
     computed: {
+      isIndeterminate() {
+        return !this.isSelected && (this.isDescendantSelected || this.isAncestorSelected);
+      },
       isSelectedIndirectly() {
-        return this.isAncestorSelected && !this.isSelected;
+        return this.isIndeterminate && !this.isDescendantSelected;
       },
     },
     methods: {
@@ -64,3 +71,12 @@
   };
 
 </script>
+
+
+<style lang="scss" scoped>
+
+  .selected-indirectly {
+    opacity: 0.5;
+  }
+
+</style>

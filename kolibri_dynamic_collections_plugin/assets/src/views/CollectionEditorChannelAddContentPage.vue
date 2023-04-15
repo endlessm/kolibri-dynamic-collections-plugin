@@ -15,7 +15,6 @@
         v-if="isTopicVisible && visibleChildren.length > 0"
         class="collection-channel-content"
         :topic="topic"
-        :disabledNodeIds="selectedNodeIds"
         :children="visibleChildren"
         @navigate="onContentNodeNavigate"
       >
@@ -24,6 +23,7 @@
             :contentNode="contentNode"
             :disabled="isDisabled"
             :isSelected="isNodeAdded(contentNode)"
+            :isDescendantSelected="isNodeDescendantAdded(contentNode)"
             :isAncestorSelected="isNodeAncestorAdded(contentNode)"
             @toggle="onContentNodeCheckboxToggle"
           />
