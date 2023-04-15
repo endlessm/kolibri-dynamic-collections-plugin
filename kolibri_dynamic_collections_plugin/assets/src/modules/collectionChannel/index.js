@@ -1,6 +1,6 @@
 function defaultState() {
   return {
-    channel: {},
+    channelId: null,
     selectedNodes: [],
   };
 }
@@ -13,7 +13,7 @@ export default {
       Object.assign(state, defaultState());
     },
     SET_STATE(state, payload) {
-      state.channel = payload.channel || {};
+      state.channelId = payload.channelId || null;
       state.selectedNodes = payload.selectedNodes || [];
     },
   },

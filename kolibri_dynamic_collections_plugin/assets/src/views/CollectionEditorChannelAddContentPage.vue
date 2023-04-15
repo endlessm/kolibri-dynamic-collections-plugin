@@ -71,11 +71,8 @@
     },
     computed: {
       ...mapGetters('collectionChannel', ['selectedNodeIds']),
-      ...mapState('collectionChannel', ['channel']),
+      ...mapState('collectionChannel', ['channelId']),
       ...mapState('channelBrowser', ['topic', 'children']),
-      channelId() {
-        return this.channel.id;
-      },
       immersivePageRoute() {
         return this.$router.getRoute(PageNames.COLLECTION_EDITOR_CHANNEL, {
           channelId: this.channelId,

@@ -47,7 +47,7 @@
     },
     computed: {
       channel() {
-        return this.$store.getters['getChannelObject'](this.channelId);
+        return this.$store.getters['getChannelObject'](this.channelId) || {};
       },
       channelImportUrl() {
         // TODO: Instead of navigating to this page, we should run the

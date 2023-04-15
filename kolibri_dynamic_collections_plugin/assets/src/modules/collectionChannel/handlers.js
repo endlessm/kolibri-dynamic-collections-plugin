@@ -14,7 +14,7 @@ export function showCollectionChannel(store, { channelId }) {
         return;
       }
       store.commit('collectionChannel/SET_STATE', {
-        channel: store.getters.getChannelObject(channelId),
+        channelId,
         selectedNodes,
       });
     })
