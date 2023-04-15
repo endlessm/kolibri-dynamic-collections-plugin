@@ -8,9 +8,10 @@ export function loadContentNodeDetails(node) {
   // includes asking the server for a list of all of its children.
   // FIXME: Replace this with a custom API that returns the data we need using
   //        a single request: <https://phabricator.endlessm.com/T34841>
-  return calculateTotalSizeForNode(node).then(totalSize => ({
+  return fetchDetailsForNode(node).then(({ total_file_size, descendant_node_ids }) => ({
     ...normalizeContentNode(node),
-    total_file_size: totalSize,
+    total_file_size,
+    descendant_node_ids,
   }));
 }
 
@@ -25,9 +26,12 @@ export function normalizeContentNode(node) {
   };
 }
 
-function calculateTotalSizeForNode(node) {
+function fetchDetailsForNode(node) {
   if (node.is_leaf) {
-    return Promise.resolve(calculateTotalSizeForFiles(node.files));
+    return Promise.resolve({
+      total_file_size: calculateTotalSizeForFiles(node.files),
+      descendant_node_ids: [],
+    });
   }
 
   return AllContentNodeResource.fetchCollection({
@@ -37,9 +41,13 @@ function calculateTotalSizeForNode(node) {
       lft__gt: node.lft,
       rght__lt: node.rght,
     },
-  }).then(children =>
-    children.reduce((sum, child) => sum + calculateTotalSizeForFiles(child.files), 0)
-  );
+  }).then(children => ({
+    total_file_size: children.reduce(
+      (sum, child) => sum + calculateTotalSizeForFiles(child.files),
+      0
+    ),
+    descendant_node_ids: children.map(child => child.id),
+  }));
 }
 
 function calculateTotalSizeForFiles(files) {
