@@ -34,16 +34,13 @@
         <p v-if="isTopicVisible">
           {{ $tr('hiddenItemsMessage', { count: hiddenChildrenCount }) }}
         </p>
-        <p v-else-if="topic.parent">
-          {{ $tr('hiddenTopicMessage') }}
-        </p>
         <p v-else>
-          {{ $tr('hiddenChannelMessage') }}
+          {{ topic.parent ? $tr('hiddenTopicMessage') : $tr('hiddenChannelMessage') }}
         </p>
         <div v-if="visibleChildren.length === 0 && isTopicVisible">
           <CollectionContentNodeCheckbox
             :contentNode="topic"
-            :label="$tr('addTopicCheckboxLabel')"
+            :label="topic.parent ? $tr('addTopicCheckboxLabel') : $tr('addChannelCheckboxLabel')"
             :isSelected="isNodeAdded(topic)"
             :isDescendantSelected="isNodeDescendantAdded(topic)"
             :isAncestorSelected="isNodeAncestorAdded(topic)"
@@ -218,17 +215,22 @@
       },
       hiddenItemsMessage: {
         message:
-          '{count, number} {count, plural, one {item from this topic has} other {items from this topic have}} already been added to the collection.',
+          '{count, number} {count, plural, one {item from this view has} other {items from this view have}} already been added to the collection.',
         context:
           'Label identifying the number of items that have been hidden from view because they were already added',
-      },
-      hiddenTopicMessage: {
-        message: 'All items from this topic have already been added to the collection.',
-        context: 'Label indicating that all items from this topic have already been added',
       },
       hiddenChannelMessage: {
         message: 'All items from this channel have already been added to the collection.',
         context: 'Label indicating that all items from this channel have already been added',
+      },
+      addChannelCheckboxLabel: {
+        message: 'Add this entire channel instead?',
+        context:
+          'Label for a checkbox that offers to add an entire channel if all its children have been added',
+      },
+      hiddenTopicMessage: {
+        message: 'All items from this topic have already been added to the collection.',
+        context: 'Label indicating that all items from this topic have already been added',
       },
       addTopicCheckboxLabel: {
         message: 'Add this entire topic instead?',
@@ -237,7 +239,7 @@
       },
       selectionSummaryText: {
         message:
-          '{count, number} {count, plural, one {item selected} other {items selected}} (~{size})',
+          '{count, number} {count, plural, one {item selected} other {items selected}} ({size})',
         context: 'Label identifying the number of items that are being added',
       },
     },
