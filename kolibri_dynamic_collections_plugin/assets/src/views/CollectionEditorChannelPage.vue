@@ -55,9 +55,9 @@
       EditorPageHeader,
     },
     computed: {
-      ...mapState('collectionChannel', ['channel', 'selectedNodes']),
-      channelId() {
-        return this.channel.id;
+      ...mapState('collectionChannel', ['channelId', 'selectedNodes']),
+      channel() {
+        return this.$store.getters['getChannelObject'](this.channelId) || {};
       },
       channelName() {
         return this.channel.title;
