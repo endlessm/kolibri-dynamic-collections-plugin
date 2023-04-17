@@ -1,9 +1,7 @@
 function defaultState() {
   return {
     channel: {},
-    topic: {},
-    children: [],
-    selectionRanges: [],
+    selectedNodes: [],
   };
 }
 
@@ -16,13 +14,12 @@ export default {
     },
     SET_STATE(state, payload) {
       state.channel = payload.channel || {};
-      state.topic = payload.topic || {};
-      state.children = payload.children || [];
+      state.selectedNodes = payload.selectedNodes || [];
     },
   },
   getters: {
-    selectedNodeIds(state, getters, rootState) {
-      return rootState.collectionBase.selectedNodeIdsByChannel[state.channel.id] || [];
+    selectedNodeIds(state) {
+      return state.selectedNodes.map(node => node.id);
     },
   },
 };

@@ -20,12 +20,15 @@
     </template>
     <template #tbody>
       <tbody>
-        <tr v-for="nodeId in selectedNodeIds" :key="nodeId">
-          <td><slot name="nodeActions"></slot></td>
-          <td>?</td>
-          <td>{{ nodeId }}</td>
-          <td>0</td>
-        </tr>
+        <CollectionSelectionsTableRow
+          v-for="contentNode in selectedNodesByLft"
+          :key="contentNode.id"
+          :contentNode="contentNode"
+        >
+          <template #actions>
+            <slot name="nodeActions" v-bind="{ contentNode }"></slot>
+          </template>
+        </CollectionSelectionsTableRow>
       </tbody>
     </template>
   </CoreTable>
@@ -36,19 +39,25 @@
 <script>
 
   import CoreTable from 'kolibri.coreVue.components.CoreTable';
+  import CollectionSelectionsTableRow from './CollectionSelectionsTableRow';
 
   export default {
     name: 'CollectionSelectionsTable',
     components: {
+      CollectionSelectionsTableRow,
       CoreTable,
     },
     props: {
-      selectedNodeIds: {
+      selectedNodes: {
         type: Array,
         required: true,
       },
     },
-    methods: {},
+    computed: {
+      selectedNodesByLft() {
+        return this.selectedNodes.slice().sort((nodeA, nodeB) => nodeA.lft - nodeB.lft);
+      },
+    },
     $trs: {
       selectedHeader: {
         message: 'Selected',

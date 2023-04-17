@@ -27,9 +27,9 @@
       </div> -->
 
       <CollectionSelectionsTable
-        v-if="selectedNodeIds.length > 0"
+        v-if="selectedNodes.length > 0"
         class="collection-channel-content"
-        :selectedNodeIds="selectedNodeIds"
+        :selectedNodes="selectedNodes"
       />
       <div v-else class="collection-channel-empty">
         <p>
@@ -45,7 +45,7 @@
 
 <script>
 
-  import { mapGetters, mapState } from 'vuex';
+  import { mapState } from 'vuex';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import { PageNames } from '../constants';
   import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
@@ -59,10 +59,9 @@
       EditorPageHeader,
     },
     computed: {
-      ...mapGetters('collectionChannel', ['selectedNodeIds']),
-      ...mapState('collectionChannel', ['channel']),
+      ...mapState('collectionChannel', ['channel', 'selectedNodes']),
       channelId() {
-        return this.$route.params.channelId;
+        return this.channel.id;
       },
       channelName() {
         return this.channel.title;
