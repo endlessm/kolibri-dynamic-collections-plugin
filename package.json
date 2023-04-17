@@ -1,6 +1,6 @@
 {
   "name": "kolibri-dynamic-collections-plugin",
-  "description": "Zim file render plugin for Kolibri",
+  "description": "Dynamic collections plugin for Kolibri",
   "private": true,
   "scripts": {
     "build": "kolibri-tools build prod --plugins kolibri_dynamic_collections_plugin",

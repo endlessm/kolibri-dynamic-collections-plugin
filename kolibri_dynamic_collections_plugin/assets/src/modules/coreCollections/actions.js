@@ -21,9 +21,9 @@ function _channelListState(data) {
 
 function _sanitize(collectionDataObject) {
   const existingNodes = collectionDataObject.channels
-    .map((channel) => channel.include_node_ids)
+    .map(channel => channel.include_node_ids)
     .reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
-  const tagsSanitized = collectionDataObject.metadata.tagged_node_ids.filter((tagged) => {
+  const tagsSanitized = collectionDataObject.metadata.tagged_node_ids.filter(tagged => {
     if (tagged.tags.length === 0) {
       return false;
     }
