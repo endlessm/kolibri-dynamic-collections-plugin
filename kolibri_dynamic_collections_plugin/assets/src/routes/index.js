@@ -1,6 +1,7 @@
 import store from 'kolibri.coreVue.vuex.store';
 import CollectionEditorPage from '../views/CollectionEditorPage';
 import CollectionEditorChannelPage from '../views/CollectionEditorChannelPage';
+import CollectionEditorChannelAddContentPage from '../views/CollectionEditorChannelAddContentPage';
 import { showCollection } from '../modules/collectionBase/handlers';
 import { showCollectionChannel } from '../modules/collectionChannel/handlers';
 import { PageNames } from '../constants';
@@ -26,12 +27,12 @@ export default [
     },
   },
   {
-    name: PageNames.COLLECTION_EDITOR_CHANNEL_TOPIC,
-    path: '/editor/:channelId/:topicId',
-    component: CollectionEditorChannelPage,
+    name: PageNames.COLLECTION_EDITOR_CHANNEL_ADD_CONTENT,
+    path: '/editor/:channelId/add/:topicId?',
+    component: CollectionEditorChannelAddContentPage,
     handler(toRoute) {
       const { channelId, topicId } = toRoute.params;
-      store.commit('SET_PAGE_NAME', PageNames.COLLECTION_EDITOR_CHANNEL);
+      store.commit('SET_PAGE_NAME', PageNames.COLLECTION_EDITOR_CHANNEL_ADD_CONTENT);
       showCollectionChannel(store, { channelId, topicId });
     },
   },

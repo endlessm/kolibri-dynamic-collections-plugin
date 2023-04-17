@@ -6,7 +6,7 @@
         <span class="visuallyhidden">
           {{ $tr('selectedHeader') }}
         </span>
-        <slot name="nodeActions" v-bind="buildContentNodeProps(topic)"></slot>
+        <slot name="nodeActions"></slot>
       </th>
       <th class="content-node-thumbnail-column">
         <span class="visuallyhidden">
@@ -20,20 +20,12 @@
     </template>
     <template #tbody>
       <tbody>
-        <CollectionContentNodeTableRow
-          v-for="contentNode in children"
-          :key="contentNode.id"
-          :contentNode="contentNode"
-          :class="{ 'content-node-faded': fadeNodeIds.includes(contentNode.id) }"
-          @navigate="$emit('navigate', { nodeId: contentNode.id })"
-        >
-          <template #actions>
-            <slot name="nodeActions" v-bind="buildContentNodeProps(contentNode)"></slot>
-          </template>
-          <template #extraActions>
-            <slot name="nodeExtraActions" v-bind="buildContentNodeProps(contentNode)"></slot>
-          </template>
-        </CollectionContentNodeTableRow>
+        <tr v-for="nodeId in selectedNodeIds" :key="nodeId">
+          <td><slot name="nodeActions"></slot></td>
+          <td>?</td>
+          <td>{{ nodeId }}</td>
+          <td>0</td>
+        </tr>
       </tbody>
     </template>
   </CoreTable>
@@ -44,35 +36,19 @@
 <script>
 
   import CoreTable from 'kolibri.coreVue.components.CoreTable';
-  import CollectionContentNodeTableRow from './CollectionContentNodeTableRow';
 
   export default {
-    name: 'CollectionContentNodeTable',
+    name: 'CollectionSelectionsTable',
     components: {
       CoreTable,
-      CollectionContentNodeTableRow,
     },
     props: {
-      topic: {
-        type: Object,
+      selectedNodeIds: {
+        type: Array,
         required: true,
       },
-      children: {
-        type: Array,
-        default: () => [],
-      },
-      fadeNodeIds: {
-        type: Array,
-        default: () => [],
-      },
     },
-    methods: {
-      buildContentNodeProps(contentNode) {
-        return {
-          contentNode,
-        };
-      },
-    },
+    methods: {},
     $trs: {
       selectedHeader: {
         message: 'Selected',
@@ -96,10 +72,6 @@
 
   th {
     vertical-align: middle;
-  }
-
-  .content-node-faded {
-    opacity: 0.8;
   }
 
   .content-node-selected-column,

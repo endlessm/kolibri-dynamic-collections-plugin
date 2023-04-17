@@ -9,35 +9,30 @@
     :showSubNav="false"
   >
     <KPageContainer>
-      <div class="collection-channel-header">
-        <h1>{{ $tr('collectionChannelHeader', { channelName }) }}</h1>
+      <EditorPageHeader :title="$tr('collectionChannelHeader', { channelName })">
+        <template #actions>
+          <KButtonGroup>
+            <KButton
+              :text="$tr('addContentButtonLabel')"
+              :primary="true"
+              :style="{ marginLeft: 0 }"
+              @click="$router.push(addContentRoute)"
+            />
+          </KButtonGroup>
+        </template>
+      </EditorPageHeader>
+
+      <CollectionSelectionsTable
+        v-if="selectedNodeIds.length > 0"
+        class="collection-channel-content"
+        :selectedNodeIds="selectedNodeIds"
+      />
+      <div v-else class="collection-channel-empty">
+        <p>
+          {{ $tr('emptyChannelLabel') }}
+        </p>
       </div>
 
-      <KBreadcrumbs :items="breadcrumbItems" />
-
-      <CollectionContentNodeTable
-        class="collection-channel-content"
-        :topic="topic"
-        :children="children"
-        :selectedNodeIds="selectedNodeIds"
-      >
-        <template #nodeActions="{ contentNode, isAncestorSelected, isSelected }">
-          <CollectionContentNodeCheckbox
-            :contentNode="contentNode"
-            :isSelected="isSelected"
-            :isAncestorSelected="isAncestorSelected"
-            @toggle="onCollectionContentNodeCheckboxToggled"
-          />
-        </template>
-        <template #nodeExtraActions="{ contentNode, isAncestorSelected, isSelected }">
-          <CollectionContentNodeExternalTags
-            v-if="isSelected || isAncestorSelected"
-            :contentNode="contentNode"
-            :tags="externalTagsByNode[contentNode.id]"
-            @change="onCollectionContentNodeExternalTagsChange"
-          />
-        </template>
-      </CollectionContentNodeTable>
     </KPageContainer>
   </CoreBase>
 
@@ -46,25 +41,22 @@
 
 <script>
 
-  import { mapActions, mapGetters, mapState } from 'vuex';
+  import { mapGetters, mapState } from 'vuex';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import { PageNames } from '../constants';
-  import CollectionContentNodeCheckbox from '../components/CollectionContentNodeCheckbox';
-  import CollectionContentNodeExternalTags from '../components/CollectionContentNodeExternalTags';
-  import CollectionContentNodeTable from '../components/CollectionContentNodeTable';
+  import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
+  import EditorPageHeader from '../components/EditorPageHeader';
 
   export default {
     name: 'CollectionEditorChannelPage',
     components: {
       CoreBase,
-      CollectionContentNodeCheckbox,
-      CollectionContentNodeExternalTags,
-      CollectionContentNodeTable,
+      CollectionSelectionsTable,
+      EditorPageHeader,
     },
     computed: {
-      ...mapState('collectionBase', ['externalTagsByNode']),
       ...mapGetters('collectionChannel', ['selectedNodeIds']),
-      ...mapState('collectionChannel', ['channel', 'topic', 'children']),
+      ...mapState('collectionChannel', ['channel']),
       channelId() {
         return this.$route.params.channelId;
       },
@@ -74,58 +66,29 @@
       immersivePageRoute() {
         return this.$router.getRoute(PageNames.COLLECTION_EDITOR_OVERVIEW);
       },
-      breadcrumbItems() {
-        if (!this.topic.ancestors) {
-          return null;
-        }
-        const result = [
-          ...this.topic.ancestors.map(node => ({
-            text: node.title,
-            link: this.getTopicRoute(this.channelId, node.id),
-          })),
-          {
-            text: this.topic.title,
-          },
-        ];
-        return result;
-      },
-    },
-    methods: {
-      ...mapActions('collectionBase', ['setNodeIncluded', 'setExternalTagsForNode']),
-      getTopicRoute(channelId, topicId) {
-        if (topicId && topicId !== channelId) {
-          return this.$router.getRoute(PageNames.COLLECTION_EDITOR_CHANNEL_TOPIC, {
-            channelId,
-            topicId,
-          });
-        } else {
-          return this.$router.getRoute(PageNames.COLLECTION_EDITOR_CHANNEL, {
-            channelId,
-          });
-        }
-      },
-      onCollectionContentNodeCheckboxToggled({ nodeId, included }) {
-        this.setNodeIncluded({
+      addContentRoute() {
+        return this.$router.getRoute(PageNames.COLLECTION_EDITOR_CHANNEL_ADD_CONTENT, {
           channelId: this.channelId,
-          nodeId,
-          included,
-        });
-      },
-      onCollectionContentNodeExternalTagsChange({ nodeId, tags }) {
-        this.setExternalTagsForNode({
-          nodeId,
-          tags,
+          topicId: null,
         });
       },
     },
     $trs: {
+      addContentButtonLabel: {
+        message: 'Add Content',
+        context: 'Label for the Add Content button.',
+      },
       collectionChannelAppBarTitle: {
-        message: 'Manage Channel Selections',
+        message: 'Manage Channel',
         context: 'App bar title for the collections plugin channel editor',
       },
       collectionChannelHeader: {
-        message: `Selections for '{channelName}'`,
+        message: `{channelName}`,
         context: 'Title of the Collections Editor page.',
+      },
+      emptyChannelLabel: {
+        message: 'No content selected.',
+        context: 'Placeholder message when there is no content selected for a channel.',
       },
     },
   };
@@ -135,15 +98,18 @@
 
 <style lang="scss" scoped>
 
+  @import '~kolibri-design-system/lib/styles/definitions';
+  @import '~kolibri-design-system/lib/keen/styles/imports';
+
   .collection-channel-header {
     p {
       margin-bottom: 0;
     }
   }
 
-  .collection-channel-content {
-    /* 24px is a magic number used for ".move-down" in some Kolibri core plugins */
-    margin-top: 24px;
+  .collection-channel-empty {
+    font-size: 0.85em;
+    border-top: solid $ui-input-border-width $ui-input-border-color;
   }
 
 </style>

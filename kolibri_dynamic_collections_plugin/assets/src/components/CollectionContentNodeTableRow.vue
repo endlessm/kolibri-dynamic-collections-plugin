@@ -24,10 +24,10 @@
     </td>
     <td>
       <template v-if="!isLeaf">
-        <KRouterLink
+        <KButton
           appearance="basic-link"
           :text="title"
-          :to="topicNodePage"
+          @click="$emit('navigate')"
         />
       </template>
       <template v-else>
@@ -70,7 +70,6 @@
   import urls from 'kolibri.urls';
   import { getContentNodeThumbnail } from 'kolibri.utils.contentNode';
   import bytesForHumans from 'kolibri.utils.bytesForHumans';
-  import { PageNames } from '../constants';
   import LearningActivityIcon from './LearningActivityIcon';
 
   export default {
@@ -108,12 +107,6 @@
       },
       thumbnailUrl() {
         return getContentNodeThumbnail(this.contentNode);
-      },
-      topicNodePage() {
-        return {
-          name: PageNames.COLLECTION_EDITOR_CHANNEL_TOPIC,
-          params: { channelId: this.channelId, topicId: this.nodeId },
-        };
       },
       previewUrl() {
         const urlFn = urls['kolibri:kolibri.plugins.learn:learn'];
