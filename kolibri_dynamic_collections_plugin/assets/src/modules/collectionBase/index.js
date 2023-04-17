@@ -139,20 +139,16 @@ export default {
       delete selectedNodeIdsByChannel[channelId];
       store.commit('SET_STATE', { ...store.state, selectedChannels, selectedNodeIdsByChannel });
     },
-    setNodeIncluded(store, { channelId, nodeId, included }) {
+    addSelectedNodes(store, { channelId, nodeIds }) {
       const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
-      const externalTagsByNode = { ...store.state.externalTagsByNode };
 
       const channelNodeIds = new Set(selectedNodeIdsByChannel[channelId]);
-      if (included) {
+      for (const nodeId of nodeIds) {
         channelNodeIds.add(nodeId);
-      } else {
-        channelNodeIds.delete(nodeId);
-        delete externalTagsByNode[nodeId];
       }
       selectedNodeIdsByChannel[channelId] = Array.from(channelNodeIds);
 
-      store.commit('SET_STATE', { ...store.state, externalTagsByNode, selectedNodeIdsByChannel });
+      store.commit('SET_STATE', { ...store.state, selectedNodeIdsByChannel });
     },
     setExternalTagsForNode(store, { nodeId, tags }) {
       const externalTagsByNode = { ...store.state.externalTagsByNode };

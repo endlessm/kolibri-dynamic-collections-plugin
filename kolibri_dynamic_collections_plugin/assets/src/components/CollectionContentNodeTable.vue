@@ -24,6 +24,8 @@
           v-for="contentNode in children"
           :key="contentNode.id"
           :contentNode="contentNode"
+          :class="{ 'content-node-disabled': isNodeDisabled(contentNode) }"
+          @navigate="$emit('navigate', { nodeId: contentNode.id })"
         >
           <template #actions>
             <slot name="nodeActions" v-bind="buildContentNodeProps(contentNode)"></slot>
@@ -59,7 +61,7 @@
         type: Array,
         default: () => [],
       },
-      selectedNodeIds: {
+      disabledNodeIds: {
         type: Array,
         required: true,
       },
@@ -68,18 +70,14 @@
       buildContentNodeProps(contentNode) {
         return {
           contentNode,
-          isSelected: this.isNodeSelected(contentNode),
-          isAncestorSelected: this.isNodeAncestorSelected(contentNode),
+          isDisabled: this.isNodeDisabled(contentNode),
         };
       },
-      isNodeSelected(contentNode) {
+      isNodeDisabled(contentNode) {
         // TODO: Instead of doing this locally, update AllContentNodeViewset
         //       to accept a content manifest as request payload and annotate
         //       results to describe whether nodes are included.
-        return this.selectedNodeIds.indexOf(contentNode.id) >= 0;
-      },
-      isNodeAncestorSelected(contentNode) {
-        return contentNode.ancestors.some(ancestorNode => this.isNodeSelected(ancestorNode));
+        return this.disabledNodeIds.indexOf(contentNode.id) >= 0;
       },
     },
     $trs: {
@@ -105,6 +103,10 @@
 
   th {
     vertical-align: middle;
+  }
+
+  .content-node-disabled {
+    opacity: 0.6;
   }
 
   .content-node-selected-column,
