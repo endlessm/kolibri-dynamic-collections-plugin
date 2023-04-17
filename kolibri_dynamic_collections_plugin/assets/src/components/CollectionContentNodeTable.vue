@@ -62,7 +62,7 @@
       },
       disabledNodeIds: {
         type: Array,
-        required: true,
+        default: () => [],
       },
     },
     methods: {

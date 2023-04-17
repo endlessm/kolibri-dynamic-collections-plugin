@@ -6,6 +6,7 @@
     :indeterminate="isSelectedIndirectly"
     :class="{ 'selected-indirectly': isSelectedIndirectly }"
     :title="$tr('checkboxTooltip')"
+    :label="label"
     :style="{ marginTop: 0, marginBottom: 0 }"
     @change="onNodeCheckboxToggled"
   />
@@ -23,6 +24,10 @@
       contentNode: {
         type: Object,
         required: true,
+      },
+      label: {
+        type: String,
+        default: null,
       },
       disabled: {
         type: Boolean,
