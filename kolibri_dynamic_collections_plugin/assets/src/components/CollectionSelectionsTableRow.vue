@@ -13,7 +13,7 @@
     </td>
     <td>{{ bytesText }}</td>
     <td class="core-table-button-col">
-      <slot name="quickActions"></slot>
+      <slot name="extraActions"></slot>
     </td>
   </tr>
 

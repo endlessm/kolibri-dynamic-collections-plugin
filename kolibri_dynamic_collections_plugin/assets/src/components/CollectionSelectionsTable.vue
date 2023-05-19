@@ -27,6 +27,9 @@
           <template #actions>
             <slot name="nodeActions" v-bind="{ contentNode }"></slot>
           </template>
+          <template #extraActions>
+            <slot name="nodeExtraActions" v-bind="{ contentNode }"></slot>
+          </template>
         </CollectionSelectionsTableRow>
       </tbody>
     </template>
