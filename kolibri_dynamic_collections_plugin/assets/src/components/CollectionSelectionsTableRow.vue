@@ -7,6 +7,7 @@
     <td class="content-node-cell">
       <ContentNodeTile
         :contentNode="contentNode"
+        :alwaysShowPreviewLink="true"
         :showBreadcrumbs="true"
       />
     </td>

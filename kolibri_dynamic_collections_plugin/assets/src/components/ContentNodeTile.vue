@@ -23,7 +23,7 @@
         {{ $tr('allContentLabel') }}
       </div>
       <ContentNodePreviewLink
-        v-if="contentNode.is_leaf && showPreviewLink"
+        v-if="(contentNode.is_leaf && showPreviewLink) || alwaysShowPreviewLink"
         :contentNode="contentNode"
         class="content-node-preview"
       />
@@ -50,6 +50,10 @@
         required: true,
       },
       showBreadcrumbs: {
+        type: Boolean,
+        default: false,
+      },
+      alwaysShowPreviewLink: {
         type: Boolean,
         default: false,
       },
