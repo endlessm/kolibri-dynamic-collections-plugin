@@ -47,12 +47,19 @@
       isAvailable() {
         return this.contentNode.available;
       },
+      isLeaf() {
+        return this.contentNode.is_leaf;
+      },
       previewUrl() {
         const urlFn = urls['kolibri:kolibri.plugins.learn:learn'];
         if (!urlFn) {
           return null;
         }
-        return `${urlFn()}#/topics/c/${this.nodeId}`;
+        if (this.isLeaf) {
+          return `${urlFn()}#/topics/c/${this.nodeId}`;
+        } else {
+          return `${urlFn()}#/topics/t/${this.nodeId}`;
+        }
       },
       importUrl() {
         // TODO: Instead of navigating to this page, we should run the
