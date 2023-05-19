@@ -1,7 +1,7 @@
 function defaultState() {
   return {
     channelId: null,
-    selectedNodes: [],
+    cachedNodesDetails: [],
   };
 }
 
@@ -14,12 +14,17 @@ export default {
     },
     SET_STATE(state, payload) {
       state.channelId = payload.channelId || null;
-      state.selectedNodes = payload.selectedNodes || [];
+      state.cachedNodesDetails = payload.cachedNodesDetails || [];
     },
   },
   getters: {
-    selectedNodeIds(state) {
-      return state.selectedNodes.map(node => node.id);
+    selectedNodeIds(state, getters, rootState) {
+      return rootState.collectionBase.selectedNodeIdsByChannel[state.channelId] || [];
+    },
+    selectedNodes(state, getters) {
+      return state.cachedNodesDetails.filter(contentNode =>
+        getters.selectedNodeIds.includes(contentNode.id)
+      );
     },
   },
 };

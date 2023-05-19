@@ -50,7 +50,7 @@
 
 <script>
 
-  import { mapActions, mapState } from 'vuex';
+  import { mapActions, mapGetters, mapState } from 'vuex';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import { PageNames } from '../constants';
   import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
@@ -64,7 +64,8 @@
       EditorPageHeader,
     },
     computed: {
-      ...mapState('collectionChannel', ['channelId', 'selectedNodes']),
+      ...mapState('collectionChannel', ['channelId']),
+      ...mapGetters('collectionChannel', ['selectedNodes']),
       channel() {
         return this.$store.getters['getChannelObject'](this.channelId) || {};
       },

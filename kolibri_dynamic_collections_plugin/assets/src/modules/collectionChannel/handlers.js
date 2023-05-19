@@ -8,13 +8,15 @@ export function showCollectionChannel(store, { channelId }) {
   return Promise.all(
     selectedNodeIds.map(nodeId => AllContentNodeResource.fetchModel({ id: nodeId }))
   )
-    .then(selectedNodes => {
-      if (shouldResolve()) {
-        store.commit('collectionChannel/SET_STATE', {
-          channel: store.getters.getChannelObject(channelId),
-          selectedNodes: selectedNodes.map(normalizeContentNode),
-        });
+    .then(selectedNodes => Promise.all(selectedNodes.map(normalizeContentNode)))
+    .then(cachedNodesDetails => {
+      if (!shouldResolve()) {
+        return;
       }
+      store.commit('collectionChannel/SET_STATE', {
+        channelId,
+        cachedNodesDetails,
+      });
     })
     .catch(error => {
       // TODO: If the channel is unavailable, we should handle it gracefully
