@@ -42,9 +42,10 @@
         :channelIds="selectedChannelIds"
       >
         <template #channelActions="{ channelId }">
-          <KButton
+          <KIconButton
             appearance="flat-button"
-            :text="$tr('removeButtonLabel')"
+            icon="remove"
+            :title="$tr('removeChannelButtonTooltip')"
             @click="removeChannel({ channelId })"
           />
         </template>
@@ -173,9 +174,9 @@
         message: 'Start adding channels, or upload an existing collection manifest.',
         context: 'Label for the file input form',
       },
-      removeButtonLabel: {
-        message: 'Remove',
-        context: 'Label for the Remove button.',
+      removeChannelButtonTooltip: {
+        message: 'Remove Channel',
+        context: 'Tooltip for the Remove Channel icon button.',
       },
       renameButtonLabel: {
         message: 'Rename',
