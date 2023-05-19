@@ -30,7 +30,16 @@
         v-if="selectedNodes.length > 0"
         class="collection-channel-content"
         :selectedNodes="selectedNodes"
-      />
+      >
+        <template #nodeExtraActions="{ contentNode }">
+          <KIconButton
+            appearance="flat-button"
+            icon="remove"
+            :title="$tr('nodeRemoveButtonTooltip')"
+            @click="onNodeRemoveButtonClick({ contentNode })"
+          />
+        </template>
+      </CollectionSelectionsTable>
       <div v-else class="collection-channel-empty">
         <p>
           {{ $tr('emptyChannelLabel') }}
@@ -45,7 +54,7 @@
 
 <script>
 
-  import { mapGetters, mapState } from 'vuex';
+  import { mapActions, mapGetters, mapState } from 'vuex';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import { PageNames } from '../constants';
   import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
@@ -77,6 +86,12 @@
         });
       },
     },
+    methods: {
+      ...mapActions('collectionBase', ['removeSelectedNode']),
+      onNodeRemoveButtonClick({ contentNode }) {
+        this.removeSelectedNode({ channelId: this.channelId, nodeId: contentNode.id });
+      },
+    },
     $trs: {
       addContentButtonLabel: {
         message: 'Add Content',
@@ -93,6 +108,10 @@
       emptyChannelLabel: {
         message: 'No content selected.',
         context: 'Placeholder message when there is no content selected for a channel.',
+      },
+      nodeRemoveButtonTooltip: {
+        message: 'Remove Content',
+        context: 'Tooltip for the Remove Content icon button.',
       },
     },
   };
