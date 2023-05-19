@@ -9,13 +9,13 @@ export function showCollectionChannel(store, { channelId }) {
     selectedNodeIds.map(nodeId => AllContentNodeResource.fetchModel({ id: nodeId }))
   )
     .then(selectedNodes => Promise.all(selectedNodes.map(loadContentNodeDetails)))
-    .then(selectedNodes => {
+    .then(cachedNodesDetails => {
       if (!shouldResolve()) {
         return;
       }
       store.commit('collectionChannel/SET_STATE', {
         channelId,
-        selectedNodes,
+        cachedNodesDetails,
       });
     })
     .catch(error => {
