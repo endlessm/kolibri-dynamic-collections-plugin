@@ -27,6 +27,23 @@
         class="collection-channel-content"
         :selectedNodes="selectedNodes"
       >
+        <template #nodeActions="{ contentNode }">
+          <KCheckbox
+            v-if="contentNode"
+            :checked="bulkEditNodeIds.includes(contentNode.id)"
+            :title="$tr('nodeCheckboxTooltip')"
+            :style="{ marginTop: 0, marginBottom: 0 }"
+            @change="onNodeCheckboxChange($event, { contentNode })"
+          />
+          <KCheckbox
+            v-else
+            :checked="isEveryNodeChecked"
+            :indeterminate="bulkEditNodeIds.length > 0 && !isEveryNodeChecked"
+            :title="$tr('allNodesCheckboxTooltip')"
+            :style="{ marginTop: 0, marginBottom: 0 }"
+            @change="onAllNodesCheckboxChange"
+          />
+        </template>
         <template #nodeExtraActions="{ contentNode }">
           <KIconButton
             appearance="flat-button"
@@ -42,6 +59,12 @@
         </p>
       </div>
 
+      <BottomAppBar v-if="bulkEditNodeIds.length > 0">
+        <BulkSelectionForm
+          :defaultTags="bulkSelectionEditorDefaultTags"
+          @submit="onBulkSelectionFormSubmit"
+        />
+      </BottomAppBar>
     </KPageContainer>
   </CoreBase>
 
@@ -50,18 +73,30 @@
 
 <script>
 
+  import intersection from 'lodash/intersection';
+  import union from 'lodash/union';
+  import without from 'lodash/without';
   import { mapActions, mapGetters, mapState } from 'vuex';
+  import BottomAppBar from 'kolibri.coreVue.components.BottomAppBar';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import { PageNames } from '../constants';
+  import BulkSelectionForm from '../components/BulkSelectionForm';
   import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
   import EditorPageHeader from '../components/EditorPageHeader';
 
   export default {
     name: 'CollectionEditorChannelPage',
     components: {
+      BottomAppBar,
       CoreBase,
+      BulkSelectionForm,
       CollectionSelectionsTable,
       EditorPageHeader,
+    },
+    data() {
+      return {
+        bulkEditNodeIds: [],
+      };
     },
     computed: {
       ...mapState('collectionChannel', ['channelId']),
@@ -72,6 +107,9 @@
       channelName() {
         return this.channel.title;
       },
+      selectedNodeIds() {
+        return this.selectedNodes.map(contentNode => contentNode.id);
+      },
       immersivePageRoute() {
         return this.$router.getRoute(PageNames.COLLECTION_EDITOR_OVERVIEW);
       },
@@ -81,10 +119,56 @@
           topicId: null,
         });
       },
+      isEveryNodeChecked() {
+        return this.selectedNodes.every(contentNode =>
+          this.bulkEditNodeIds.includes(contentNode.id)
+        );
+      },
+      bulkSelectionEditorDefaultTags() {
+        const tagsByNodeId = this.bulkEditNodeIds.map(nodeId => this.externalTagsByNode[nodeId]);
+        const tagsForAnyNode = union(...tagsByNodeId.values());
+        const tagsForAllNodes = intersection(...tagsByNodeId.values());
+        const result = Object.fromEntries(
+          tagsForAnyNode.map(tagId => [tagId, tagsForAllNodes.includes(tagId) ? true : null])
+        );
+        return result;
+      },
     },
     methods: {
-      ...mapActions('collectionBase', ['removeSelectedNode']),
+      ...mapActions('collectionBase', ['removeSelectedNode', 'changeExternalTagsForNodes']),
+      reset() {
+        this.bulkEditNodeIds = [];
+      },
+      addBulkEditNode(contentNode) {
+        this.bulkEditNodeIds = union(this.bulkEditNodeIds, [contentNode.id]);
+      },
+      removeBulkEditNode(contentNode) {
+        this.bulkEditNodeIds = without(this.bulkEditNodeIds, contentNode.id);
+      },
+      onBulkSelectionFormSubmit({ addTagIds, removeTagIds }) {
+        this.changeExternalTagsForNodes({
+          nodeIds: this.bulkEditNodeIds,
+          addTagIds,
+          removeTagIds,
+        });
+        this.reset();
+      },
+      onAllNodesCheckboxChange(checked) {
+        if (checked) {
+          this.bulkEditNodeIds = [...this.selectedNodeIds];
+        } else {
+          this.bulkEditNodeIds = [];
+        }
+      },
+      onNodeCheckboxChange(checked, { contentNode }) {
+        if (checked) {
+          this.addBulkEditNode(contentNode);
+        } else {
+          this.removeBulkEditNode(contentNode);
+        }
+      },
       onNodeRemoveButtonClick({ contentNode }) {
+        this.removeBulkEditNode(contentNode);
         this.removeSelectedNode({ channelId: this.channelId, nodeId: contentNode.id });
       },
     },
@@ -105,6 +189,14 @@
         message: 'No content selected.',
         context: 'Placeholder message when there is no content selected for a channel.',
       },
+      allNodesCheckboxTooltip: {
+        message: 'Select All',
+        context: 'Tooltip for the All Nodes checkbox, used for bulk editing.',
+      },
+      nodeCheckboxTooltip: {
+        message: 'Select',
+        context: 'Tooltip for the content node checkbox, used for bulk editing.',
+      },
       nodeRemoveButtonTooltip: {
         message: 'Remove Content',
         context: 'Tooltip for the Remove Content icon button.',
@@ -119,12 +211,6 @@
 
   @import '~kolibri-design-system/lib/styles/definitions';
   @import '~kolibri-design-system/lib/keen/styles/imports';
-
-  .collection-channel-header {
-    p {
-      margin-bottom: 0;
-    }
-  }
 
   .collection-channel-empty {
     font-size: 0.85em;

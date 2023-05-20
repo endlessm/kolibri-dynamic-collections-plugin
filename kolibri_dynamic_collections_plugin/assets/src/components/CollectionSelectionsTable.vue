@@ -6,7 +6,7 @@
         <span class="visuallyhidden">
           {{ $tr('selectedHeader') }}
         </span>
-        <slot name="nodeActions"></slot>
+        <slot name="nodeActions" v-bind="{ contentNode: null }"></slot>
       </th>
       <th class="content-node-title-column">
         <span class="visuallyhidden">

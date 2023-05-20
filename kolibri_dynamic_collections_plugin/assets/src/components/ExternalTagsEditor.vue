@@ -4,7 +4,8 @@
     <KCheckbox
       v-for="tagId in externalTagOptions"
       :key="tagId"
-      :checked="tags.indexOf(tagId) >= 0"
+      :checked="tags.includes(tagId)"
+      :indeterminate="indeterminateTags.includes(tagId)"
       :label="tagId"
       @change="onExternalTagCheckboxToggled(tagId, $event)"
     />
@@ -28,6 +29,10 @@
     mixins: [],
     props: {
       tags: {
+        type: Array,
+        default: () => [],
+      },
+      indeterminateTags: {
         type: Array,
         default: () => [],
       },
