@@ -21,7 +21,7 @@
   // TODO: Use a tags input with typeahead, similar to
   //       <https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/>
 
-  const EXTERNAL_TAGS = ['skill', 'career', 'highlight', 'curious'];
+  const EXTERNAL_TAGS = ['career', 'curious', 'highlight', 'skill'];
 
   export default {
     name: 'ExternalTagsEditor',
