@@ -46,13 +46,13 @@
   }
 
   .tag-button {
-    margin: 6px;
+    min-height: 0;
     padding: 4px;
+    margin: 6px;
+    font-family: 'Source Code Pro', monospace;
     font-size: 0.85em;
     font-weight: bold;
-    font-family: 'Source Code Pro', monospace;
     line-height: 1.75em;
-    min-height: 0;
     text-transform: none;
   }
 

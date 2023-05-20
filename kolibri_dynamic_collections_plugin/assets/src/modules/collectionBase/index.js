@@ -159,26 +159,21 @@ export default {
 
       store.commit('SET_STATE', { ...store.state, selectedNodeIdsByChannel });
     },
-    addExternalTagForNodes(store, { nodeIds, tagId }) {
+    setExternalTagsForNodes(store, { nodeIds, tagIds }) {
       const externalTagsByNode = { ...store.state.externalTagsByNode };
-      nodeIds.forEach(
-        nodeId => {
-          const externalTags = new Set(externalTagsByNode[nodeId]);
-          externalTags.add(tagId);
-          externalTagsByNode[nodeId] = Array.from(externalTags).sort();
-        }
-      );
+      nodeIds.forEach(nodeId => {
+        externalTagsByNode[nodeId] = tagIds.slice().sort();
+      });
       store.commit('SET_STATE', { ...store.state, externalTagsByNode });
     },
-    removeExternalTagForNodes(store, { nodeIds, tagId }) {
+    changeExternalTagsForNodes(store, { nodeIds, addTagIds = [], removeTagIds = [] }) {
       const externalTagsByNode = { ...store.state.externalTagsByNode };
-      nodeIds.forEach(
-        nodeId => {
-          const externalTags = new Set(externalTagsByNode[nodeId]);
-          externalTags.delete(tagId);
-          externalTagsByNode[nodeId] = Array.from(externalTags).sort();
-        }
-      );
+      nodeIds.forEach(nodeId => {
+        const externalTags = new Set(externalTagsByNode[nodeId]);
+        addTagIds.forEach(tagId => externalTags.add(tagId));
+        removeTagIds.forEach(tagId => externalTags.delete(tagId));
+        externalTagsByNode[nodeId] = Array.from(externalTags).sort();
+      });
       store.commit('SET_STATE', { ...store.state, externalTagsByNode });
     },
   },
