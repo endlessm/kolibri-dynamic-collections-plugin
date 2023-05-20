@@ -30,6 +30,14 @@
       </CollectionContentNodeTable>
 
       <BottomAppBar>
+        <div class="quick-tags-editor">
+          <ExternalTagsEditor
+            v-if="addNodeIds.length > 0"
+            :tags="quickTags"
+            @add="onQuickTagAdd"
+            @remove="onQuickTagRemove"
+          />
+        </div>
         <span class="selected-items-text">{{ selectionSummaryText }}</span>
         <KButton
           :text="$tr('submitButtonLabel')"
@@ -55,6 +63,7 @@
   import { PageNames } from '../constants';
   import CollectionContentNodeCheckbox from '../components/CollectionContentNodeCheckbox';
   import CollectionContentNodeTable from '../components/CollectionContentNodeTable';
+  import ExternalTagsEditor from '../components/ExternalTagsEditor';
 
   export default {
     name: 'CollectionEditorChannelAddContentPage',
@@ -63,11 +72,13 @@
       CollectionContentNodeCheckbox,
       CollectionContentNodeTable,
       CoreBase,
+      ExternalTagsEditor,
     },
     mixins: [commonCoreStrings],
     data() {
       return {
         addNodeIds: [],
+        quickTags: [],
       };
     },
     computed: {
@@ -102,7 +113,7 @@
       },
     },
     methods: {
-      ...mapActions('collectionBase', ['addSelectedNodes']),
+      ...mapActions('collectionBase', ['addSelectedNodes', 'setExternalTagsForNodes']),
       getTopicRoute(topicId) {
         const channelId = this.channelId;
         if (topicId && topicId !== channelId) {
@@ -127,11 +138,23 @@
           this.addNodeIds = without(this.addNodeIds, nodeId);
         }
       },
+      onQuickTagAdd({ tagId }) {
+        this.quickTags = union(this.quickTags, [tagId]);
+      },
+      onQuickTagRemove({ tagId }) {
+        this.quickTags = without(this.quickTags, tagId);
+      },
       onSubmitButtonClick() {
         this.addSelectedNodes({
           channelId: this.channelId,
           nodeIds: this.addNodeIds,
         });
+        if (this.quickTags.length > 0) {
+          this.setExternalTagsForNodes({
+            nodeIds: this.addNodeIds,
+            tagIds: this.quickTags,
+          });
+        }
         this.$router.push(this.immersivePageRoute);
       },
       isNodeIdAlreadyAdded(nodeId) {
@@ -173,6 +196,11 @@
 
 
 <style lang="scss" scoped>
+
+  .quick-tags-editor {
+    float: left;
+    margin: 0 16px;
+  }
 
   .selected-items-text {
     display: inline-block;

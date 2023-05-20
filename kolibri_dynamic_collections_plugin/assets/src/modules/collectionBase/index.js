@@ -149,9 +149,18 @@ export default {
 
       store.commit('SET_STATE', { ...store.state, selectedNodeIdsByChannel });
     },
-    setExternalTagsForNode(store, { nodeId, tags }) {
+    removeSelectedNode(store, { channelId, nodeId }) {
+      const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
+
+      selectedNodeIdsByChannel[channelId] = without(selectedNodeIdsByChannel[channelId], nodeId);
+
+      store.commit('SET_STATE', { ...store.state, selectedNodeIdsByChannel });
+    },
+    setExternalTagsForNodes(store, { nodeIds, tagIds }) {
       const externalTagsByNode = { ...store.state.externalTagsByNode };
-      externalTagsByNode[nodeId] = tags.slice().sort();
+      nodeIds.forEach(nodeId => {
+        externalTagsByNode[nodeId] = tagIds.slice().sort();
+      });
       store.commit('SET_STATE', { ...store.state, externalTagsByNode });
     },
   },

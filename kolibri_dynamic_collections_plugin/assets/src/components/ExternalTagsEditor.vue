@@ -1,6 +1,6 @@
 <template>
 
-  <div class="content-node-external-tags">
+  <div class="external-tags-editor">
     <KCheckbox
       v-for="tagId in externalTagOptions"
       :key="tagId"
@@ -20,17 +20,13 @@
   // TODO: Use a tags input with typeahead, similar to
   //       <https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/>
 
-  const EXTERNAL_TAGS = ['skill', 'career', 'highlight', 'curious'];
+  const EXTERNAL_TAGS = ['career', 'curious', 'highlight', 'skill'];
 
   export default {
-    name: 'CollectionContentNodeExternalTags',
+    name: 'ExternalTagsEditor',
     components: {},
     mixins: [],
     props: {
-      contentNode: {
-        type: Object,
-        required: true,
-      },
       tags: {
         type: Array,
         default: () => [],
@@ -40,22 +36,14 @@
       externalTagOptions() {
         return EXTERNAL_TAGS;
       },
-      nodeId() {
-        return this.contentNode.id;
-      },
     },
     methods: {
       onExternalTagCheckboxToggled(tagId, value) {
-        const tagsSet = new Set(this.tags);
         if (value) {
-          tagsSet.add(tagId);
+          this.$emit('add', { tagId });
         } else {
-          tagsSet.delete(tagId);
+          this.$emit('remove', { tagId });
         }
-        this.$emit('change', {
-          nodeId: this.nodeId,
-          tags: Array.from(tagsSet),
-        });
       },
     },
   };
@@ -64,7 +52,7 @@
 
 <style lang="scss" scoped>
 
-  .content-node-external-tags {
+  .external-tags-editor {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
