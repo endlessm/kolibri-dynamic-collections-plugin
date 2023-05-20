@@ -44,6 +44,13 @@
             @change="onAllNodesCheckboxChange"
           />
         </template>
+        <template #nodeDetails="{ contentNode }">
+          <div class="node-details">
+            <ExternalTagsList
+              :tags="externalTagsByNode[contentNode.id]"
+            />
+          </div>
+        </template>
         <template #nodeExtraActions="{ contentNode }">
           <KIconButton
             appearance="flat-button"
@@ -83,6 +90,7 @@
   import BulkSelectionForm from '../components/BulkSelectionForm';
   import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
   import EditorPageHeader from '../components/EditorPageHeader';
+  import ExternalTagsList from '../components/ExternalTagsList';
 
   export default {
     name: 'CollectionEditorChannelPage',
@@ -92,6 +100,7 @@
       BulkSelectionForm,
       CollectionSelectionsTable,
       EditorPageHeader,
+      ExternalTagsList,
     },
     data() {
       return {
@@ -99,6 +108,7 @@
       };
     },
     computed: {
+      ...mapState('collectionBase', ['externalTagsByNode']),
       ...mapState('collectionChannel', ['channelId']),
       ...mapGetters('collectionChannel', ['selectedNodes']),
       channel() {
@@ -215,6 +225,10 @@
   .collection-channel-empty {
     font-size: 0.85em;
     border-top: solid $ui-input-border-width $ui-input-border-color;
+  }
+
+  .node-details {
+    margin-top: 8px;
   }
 
 </style>
