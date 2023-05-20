@@ -31,6 +31,14 @@
         class="collection-channel-content"
         :selectedNodes="selectedNodes"
       >
+        <template #nodeDetails="{ contentNode }">
+          <div class="node-details">
+            <ExternalTagsList
+              :tags="externalTagsByNode[contentNode.id]"
+              @remove="onExternalTagsListRemove(contentNode.id, $event)"
+            />
+          </div>
+        </template>
         <template #nodeExtraActions="{ contentNode }">
           <KIconButton
             appearance="flat-button"
@@ -57,6 +65,7 @@
   import { mapActions, mapGetters, mapState } from 'vuex';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
   import { PageNames } from '../constants';
+  import ExternalTagsList from '../components/ExternalTagsList';
   import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
   import EditorPageHeader from '../components/EditorPageHeader';
 
@@ -64,6 +73,7 @@
     name: 'CollectionEditorChannelPage',
     components: {
       CoreBase,
+      ExternalTagsList,
       CollectionSelectionsTable,
       EditorPageHeader,
     },
@@ -87,9 +97,12 @@
       },
     },
     methods: {
-      ...mapActions('collectionBase', ['removeSelectedNode']),
+      ...mapActions('collectionBase', ['removeSelectedNode', 'removeExternalTagForNodes']),
       onNodeRemoveButtonClick({ contentNode }) {
         this.removeSelectedNode({ channelId: this.channelId, nodeId: contentNode.id });
+      },
+      onExternalTagsListRemove(nodeId, { tagId }) {
+        this.removeExternalTagForNodes( { nodeIds: [nodeId], tagId })
       },
     },
     $trs: {
@@ -133,6 +146,10 @@
   .collection-channel-empty {
     font-size: 0.85em;
     border-top: solid $ui-input-border-width $ui-input-border-color;
+  }
+
+  .node-details {
+    margin-top: 8px;
   }
 
 </style>
