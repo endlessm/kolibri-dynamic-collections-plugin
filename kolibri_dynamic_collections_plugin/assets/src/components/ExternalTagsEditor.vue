@@ -17,12 +17,7 @@
 
 <script>
 
-  // For now, we hard code a list of external tags that are useful with
-  // Endless Key's Kolibri Explore Plugin.
-  // TODO: Use a tags input with typeahead, similar to
-  //       <https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/>
-
-  const EXTERNAL_TAGS = ['career', 'curious', 'highlight', 'skill'];
+  import { EXTERNAL_TAGS } from '../constants';
 
   export default {
     name: 'ExternalTagsEditor',

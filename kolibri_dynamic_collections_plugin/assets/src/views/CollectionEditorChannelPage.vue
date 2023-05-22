@@ -48,6 +48,8 @@
           <div class="node-details">
             <ExternalTagsList
               :tags="externalTagsByNode[contentNode.id]"
+              @add="onExternalTagsListAdd(contentNode.id, $event)"
+              @remove="onExternalTagsListRemove(contentNode.id, $event)"
             />
           </div>
         </template>
@@ -181,6 +183,12 @@
         this.removeBulkEditNode(contentNode);
         this.removeSelectedNode({ channelId: this.channelId, nodeId: contentNode.id });
       },
+      onExternalTagsListAdd(nodeId, { tagId }) {
+        this.changeExternalTagsForNodes({ nodeIds: [nodeId], addTagIds: [tagId] });
+      },
+      onExternalTagsListRemove(nodeId, { tagId }) {
+        this.changeExternalTagsForNodes({ nodeIds: [nodeId], removeTagIds: [tagId] });
+      },
     },
     $trs: {
       addContentButtonLabel: {
@@ -228,7 +236,7 @@
   }
 
   .node-details {
-    margin-top: 8px;
+    margin-top: 4px;
   }
 
 </style>
