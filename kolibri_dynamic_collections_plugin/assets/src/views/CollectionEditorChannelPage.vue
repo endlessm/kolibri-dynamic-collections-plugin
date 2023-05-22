@@ -48,6 +48,7 @@
           <div class="node-details">
             <ExternalTagsList
               :tags="externalTagsByNode[contentNode.id]"
+              @add="onExternalTagsListAdd(contentNode.id, $event)"
               @remove="onExternalTagsListRemove(contentNode.id, $event)"
             />
           </div>
@@ -238,7 +239,7 @@
   }
 
   .node-details {
-    margin-top: 8px;
+    margin-top: 4px;
   }
 
 </style>
