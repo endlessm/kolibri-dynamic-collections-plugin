@@ -12,47 +12,28 @@
       <KBreadcrumbs :items="breadcrumbItems" />
 
       <CollectionContentNodeTable
-        v-if="isTopicVisible && visibleChildren.length > 0"
         class="collection-channel-content"
         :topic="topic"
-        :children="visibleChildren"
+        :children="children"
+        :fadeNodeIds="selectedNodeIds"
         @navigate="onContentNodeNavigate"
       >
-        <template #nodeActions="{ contentNode, isDisabled }">
+        <template #nodeActions="{ contentNode }">
           <CollectionContentNodeCheckbox
             :contentNode="contentNode"
-            :disabled="isDisabled"
-            :isSelected="isNodeAdded(contentNode)"
-            :isDescendantSelected="isNodeDescendantAdded(contentNode)"
-            :isAncestorSelected="isNodeAncestorAdded(contentNode)"
+            :disabled="nodeCheckboxIsDisabled(contentNode)"
+            :isSelected="nodeCheckboxIsSelected(contentNode)"
+            :isDescendantSelected="nodeCheckboxIsDescendantSelected(contentNode)"
+            :isAncestorSelected="nodeCheckboxIsAncestorSelected(contentNode)"
             @toggle="onContentNodeCheckboxToggle"
           />
         </template>
       </CollectionContentNodeTable>
 
-      <div v-if="hiddenChildrenCount > 0" class="hidden-items-message">
-        <p v-if="isTopicVisible">
-          {{ $tr('hiddenItemsMessage', { count: hiddenChildrenCount }) }}
-        </p>
-        <p v-else>
-          {{ topic.parent ? $tr('hiddenTopicMessage') : $tr('hiddenChannelMessage') }}
-        </p>
-        <div v-if="visibleChildren.length === 0 && isTopicVisible">
-          <CollectionContentNodeCheckbox
-            :contentNode="topic"
-            :label="topic.parent ? $tr('addTopicCheckboxLabel') : $tr('addChannelCheckboxLabel')"
-            :isSelected="isNodeAdded(topic)"
-            :isDescendantSelected="isNodeDescendantAdded(topic)"
-            :isAncestorSelected="isNodeAncestorAdded(topic)"
-            @toggle="onContentNodeCheckboxToggle"
-          />
-        </div>
-      </div>
-
       <BottomAppBar>
         <div class="quick-tags-editor">
           <ExternalTagsEditor
-            v-if="this.addNodeIds.length > 0"
+            v-if="addNodeIds.length > 0"
             :tags="quickTags"
             @add="onQuickTagAdd"
             @remove="onQuickTagRemove"
@@ -123,15 +104,6 @@
           },
         ];
         return result;
-      },
-      isTopicVisible() {
-        return !this.isNodeHidden(this.topic);
-      },
-      visibleChildren() {
-        return this.children.filter(contentNode => !this.isNodeHidden(contentNode));
-      },
-      hiddenChildrenCount() {
-        return this.children.length - this.visibleChildren.length;
       },
       addNodeIds() {
         return Object.values(this.addContentNodes).map(contentNode => contentNode.id);
@@ -207,28 +179,32 @@
         }
         this.$router.push(this.immersivePageRoute);
       },
-      isNodeIdHidden(nodeId) {
+      isNodeIdAlreadyAdded(nodeId) {
         return this.selectedNodeIds.indexOf(nodeId) >= 0;
-      },
-      isNodeHidden(contentNode) {
-        return (
-          this.isNodeIdHidden(contentNode.id) ||
-          contentNode.ancestors.some(ancestorNode => this.isNodeIdHidden(ancestorNode.id))
-        );
       },
       isNodeIdAdded(nodeId) {
         return this.addNodeIds.indexOf(nodeId) >= 0;
       },
-      isNodeAdded(contentNode) {
-        return this.isNodeIdAdded(contentNode.id);
-      },
-      isNodeDescendantAdded(contentNode) {
-        return contentNode.descendant_node_ids.some(descendantNodeId =>
-          this.isNodeIdAdded(descendantNodeId)
-        );
-      },
       isNodeAncestorAdded(contentNode) {
         return contentNode.ancestors.some(ancestorNode => this.isNodeIdAdded(ancestorNode.id));
+      },
+      nodeCheckboxIsDisabled(contentNode) {
+        return this.isNodeIdAlreadyAdded(contentNode.id);
+      },
+      nodeCheckboxIsSelected(contentNode) {
+        return this.isNodeIdAlreadyAdded(contentNode.id) || this.isNodeIdAdded(contentNode.id);
+      },
+      nodeCheckboxIsDescendantSelected(contentNode) {
+        return contentNode.descendant_node_ids.some(
+          descendantNodeId =>
+            this.isNodeIdAlreadyAdded(descendantNodeId) || this.isNodeIdAdded(descendantNodeId)
+        );
+      },
+      nodeCheckboxIsAncestorSelected(contentNode) {
+        return contentNode.ancestors.some(
+          ancestorNode =>
+            this.isNodeIdAlreadyAdded(ancestorNode.id) || this.isNodeIdAdded(ancestorNode.id)
+        );
       },
     },
     $trs: {
@@ -239,30 +215,6 @@
       submitButtonLabel: {
         message: 'Add Content',
         context: 'Label for the submit button',
-      },
-      hiddenItemsMessage: {
-        message:
-          '{count, number} {count, plural, one {item from this view has} other {items from this view have}} already been added to the collection.',
-        context:
-          'Label identifying the number of items that have been hidden from view because they were already added',
-      },
-      hiddenChannelMessage: {
-        message: 'All items from this channel have already been added to the collection.',
-        context: 'Label indicating that all items from this channel have already been added',
-      },
-      addChannelCheckboxLabel: {
-        message: 'Add this entire channel instead?',
-        context:
-          'Label for a checkbox that offers to add an entire channel if all its children have been added',
-      },
-      hiddenTopicMessage: {
-        message: 'All items from this topic have already been added to the collection.',
-        context: 'Label indicating that all items from this topic have already been added',
-      },
-      addTopicCheckboxLabel: {
-        message: 'Add this entire topic instead?',
-        context:
-          'Label for a checkbox that offers to add an entire topic node if all its children have been added',
       },
       selectionSummaryText: {
         message:

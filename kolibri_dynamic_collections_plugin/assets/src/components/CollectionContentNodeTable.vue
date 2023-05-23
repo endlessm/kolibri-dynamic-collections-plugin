@@ -23,7 +23,7 @@
           v-for="contentNode in children"
           :key="contentNode.id"
           :contentNode="contentNode"
-          :class="{ 'content-node-disabled': isNodeDisabled(contentNode) }"
+          :class="{ 'content-node-faded': fadeNodeIds.includes(contentNode.id) }"
           @navigate="$emit('navigate', { nodeId: contentNode.id })"
         >
           <template #actions>
@@ -60,7 +60,7 @@
         type: Array,
         default: () => [],
       },
-      disabledNodeIds: {
+      fadeNodeIds: {
         type: Array,
         default: () => [],
       },
@@ -69,14 +69,7 @@
       buildContentNodeProps(contentNode) {
         return {
           contentNode,
-          isDisabled: this.isNodeDisabled(contentNode),
         };
-      },
-      isNodeDisabled(contentNode) {
-        // TODO: Instead of doing this locally, update AllContentNodeViewset
-        //       to accept a content manifest as request payload and annotate
-        //       results to describe whether nodes are included.
-        return this.disabledNodeIds.indexOf(contentNode.id) >= 0;
       },
     },
     $trs: {
@@ -101,7 +94,7 @@
     vertical-align: middle;
   }
 
-  .content-node-disabled {
+  .content-node-faded {
     opacity: 0.6;
   }
 
