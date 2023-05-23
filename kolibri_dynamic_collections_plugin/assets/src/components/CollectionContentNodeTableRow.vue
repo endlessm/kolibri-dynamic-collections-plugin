@@ -7,6 +7,7 @@
     <td class="content-node-cell">
       <ContentNodeTile
         :contentNode="contentNode"
+        :showPreviewLink="true"
       >
         <template v-if="!contentNode.is_leaf" #nodeTitle>
           <KButton

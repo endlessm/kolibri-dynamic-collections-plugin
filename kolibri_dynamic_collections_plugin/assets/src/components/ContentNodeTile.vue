@@ -11,7 +11,12 @@
           v-for="ancestor in contentNode.breadcrumbs"
           :key="ancestor.id"
         >
-          {{ ancestor.title }}
+          <KRouterLink
+            appearance="basic-link"
+            :appearanceOverrides="{ color: $themePalette.grey.v_700 }"
+            :text="ancestor.title"
+            :to="getAddMoreFromTopicPage(ancestor.id)"
+          />
         </li>
       </ol>
       <div v-if="contentNode.parent" class="node-title">
@@ -23,9 +28,18 @@
         {{ $tr('allContentLabel') }}
       </div>
       <ContentNodePreviewLink
-        v-if="(contentNode.is_leaf && showPreviewLink) || alwaysShowPreviewLink"
+        v-if="contentNode.is_leaf && showPreviewLink"
         :contentNode="contentNode"
         class="content-node-preview"
+      />
+      <KRouterLink
+        v-else-if="!contentNode.is_leaf && showChildrenLink"
+        appearance="basic-link"
+        class="content-node-children-label"
+        :appearanceOverrides="{ color: $themePalette.grey.v_700 }"
+        :text="topicChildrenText"
+        :title="$tr('addMoreFromTopicTooltip')"
+        :to="addMoreFromTopicPage"
       />
       <slot name="details"></slot>
     </div>
@@ -36,6 +50,7 @@
 
 <script>
 
+  import { PageNames } from '../constants';
   import ContentNodePreviewLink from './ContentNodePreviewLink';
   import ContentNodeThumbnail from './ContentNodeThumbnail';
 
@@ -54,19 +69,52 @@
         type: Boolean,
         default: false,
       },
-      alwaysShowPreviewLink: {
+      showChildrenLink: {
         type: Boolean,
         default: false,
       },
       showPreviewLink: {
         type: Boolean,
-        default: true,
+        default: false,
+      },
+    },
+    computed: {
+      addMoreFromTopicPage() {
+        return {
+          name: PageNames.COLLECTION_EDITOR_CHANNEL_ADD_CONTENT,
+          params: {
+            channelId: this.contentNode.channel_id,
+            topicId: this.contentNode.id,
+          },
+        };
+      },
+      topicChildrenText() {
+        const count = this.contentNode.descendant_node_ids.length;
+        return this.$tr('topicChildrenLabel', { count });
+      },
+    },
+    methods: {
+      getAddMoreFromTopicPage(topicId) {
+        return {
+          name: PageNames.COLLECTION_EDITOR_CHANNEL_ADD_CONTENT,
+          params: {
+            channelId: this.contentNode.channel_id,
+            topicId: topicId,
+          },
+        };
       },
     },
     $trs: {
       allContentLabel: {
         message: 'All content',
         context: 'Label indicating this selects all content in the channel.',
+      },
+      topicChildrenLabel: {
+        message:
+          'Includes {count, number} {count, plural, one {content item} other {content items}}',
+      },
+      addMoreFromTopicTooltip: {
+        message: 'Add More',
       },
     },
   };
@@ -102,10 +150,9 @@
 
     li {
       display: inline-block;
-      opacity: 0.6;
 
       &::after {
-        margin: 0 8px 0 4px;
+        margin: 0 8px;
         content: '›';
       }
 
@@ -123,7 +170,8 @@
     font-style: italic;
   }
 
-  .content-node-preview {
+  .content-node-preview,
+  .content-node-children-label {
     font-size: 0.85em;
     opacity: 0.9;
   }
