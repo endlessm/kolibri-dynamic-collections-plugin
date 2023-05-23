@@ -108,10 +108,6 @@
     box-shadow: none;
   }
 
-  .tag-button {
-    text-decoration: underline;
-  }
-
   .add-tag-button {
     font-size: 1em;
     line-height: 1.4875em;
