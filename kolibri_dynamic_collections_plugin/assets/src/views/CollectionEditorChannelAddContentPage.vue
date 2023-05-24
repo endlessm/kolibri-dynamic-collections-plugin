@@ -109,12 +109,15 @@
       addNodeIds() {
         return Object.values(this.addContentNodes).map(contentNode => contentNode.id);
       },
-      selectionSizeText() {
-        const size = Object.values(this.addContentNodes).reduce(
-          (sum, node) => sum + node.total_file_size,
+      selectionSize() {
+        return Object.values(this.addContentNodes).reduce(
+          (total, contentNode) =>
+            this.doesNodeUseExtraSpace(contentNode) ? total : total + contentNode.total_file_size,
           0
         );
-        return bytesForHumans(size);
+      },
+      selectionSizeText() {
+        return bytesForHumans(this.selectionSize);
       },
       selectionSummaryText() {
         const count = this.addNodeIds.length;
@@ -175,6 +178,12 @@
       },
       isNodeIdAdded(nodeId) {
         return this.addNodeIds.indexOf(nodeId) >= 0;
+      },
+      doesNodeUseExtraSpace(contentNode) {
+        return contentNode.ancestors.some(
+          ancestorNode =>
+            this.isNodeIdAlreadyAdded(ancestorNode.id) || this.isNodeIdAdded(ancestorNode.id)
+        );
       },
       nodeCheckboxIsDisabled(contentNode) {
         return this.isNodeIdAlreadyAdded(contentNode.id);
