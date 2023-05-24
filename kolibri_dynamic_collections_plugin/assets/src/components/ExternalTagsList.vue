@@ -1,21 +1,22 @@
 <template>
 
-  <div class="wrapper">
+  <div class="external-tags-list">
     <span class="tags-label">{{ $tr('tagsLabel') }}</span>
+    <span v-if="tags.length === 0" class="no-tags-label">{{ $tr('noTagsLabel') }}</span>
     <KButton
       v-for="tagId in tags"
+      v-else
       :key="tagId"
       class="tag-button"
-      appearance="raised-button"
-      icon="bookmark"
+      appearance="flat-button"
       :text="tagId"
       :title="$tr('removeTooltip')"
       @click="$emit('remove', { tagId })"
     />
     <KDropdownMenu
       v-if="dropdownOptions.length > 0"
-      appearance="raised-button"
-      class="dropdown-menu-button"
+      appearance="flat-button"
+      class="add-tag-button"
       text="+"
       :options="dropdownOptions"
       :title="$tr('addTooltip')"
@@ -63,6 +64,9 @@
       tagsLabel: {
         message: 'Tags:',
       },
+      noTagsLabel: {
+        message: '(No tags)',
+      },
     },
   };
 
@@ -74,34 +78,41 @@
   @import '~kolibri-design-system/lib/styles/definitions';
   @import '~kolibri-design-system/lib/keen/styles/imports';
 
-  .wrapper {
+  .external-tags-list {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    margin: -4px;
   }
 
   .tags-label {
-    margin-right: 0.5em;
-    margin-left: 6px;
+    margin: 0 0.5em 0 0;
+  }
+
+  .no-tags-label {
+    margin: 0 0.5em;
+    font-size: 0.85em;
+    color: $secondary-text-color;
   }
 
   .button {
+    min-width: 2em;
     min-height: 0;
     padding: 2px 6px;
-    margin: 4px;
     font-family: 'Source Code Pro', monospace;
     font-size: 0.85em;
     font-weight: bold;
     line-height: 1.75em;
-    text-transform: none;
-    border: solid 1px $ui-input-border-width $ui-input-border-color;
+    text-transform: none !important;
+    border: 0;
     box-shadow: none;
   }
 
-  .dropdown-menu-button {
-    min-width: 2.5em;
+  .tag-button {
+    text-decoration: underline;
+  }
+
+  .add-tag-button {
     font-size: 1em;
     line-height: 1.4875em;
 
