@@ -108,16 +108,15 @@
       addNodeIds() {
         return Object.values(this.addContentNodes).map(contentNode => contentNode.id);
       },
+      selectionSize() {
+        return Object.values(this.addContentNodes).reduce(
+          (total, contentNode) =>
+            this.doesNodeUseExtraSpace(contentNode) ? total : total + contentNode.total_file_size,
+          0
+        );
+      },
       selectionSizeText() {
-        let totalSize = 0;
-
-        for (const contentNode of Object.values(this.addContentNodes)) {
-          if (!this.isNodeAncestorAdded(contentNode)) {
-            totalSize += contentNode.total_file_size;
-          }
-        }
-
-        return bytesForHumans(totalSize);
+        return bytesForHumans(this.selectionSize);
       },
       selectionSummaryText() {
         // TODO: Can we include a rough count here?
@@ -185,8 +184,11 @@
       isNodeIdAdded(nodeId) {
         return this.addNodeIds.indexOf(nodeId) >= 0;
       },
-      isNodeAncestorAdded(contentNode) {
-        return contentNode.ancestors.some(ancestorNode => this.isNodeIdAdded(ancestorNode.id));
+      doesNodeUseExtraSpace(contentNode) {
+        return contentNode.ancestors.some(
+          ancestorNode =>
+            this.isNodeIdAlreadyAdded(ancestorNode.id) || this.isNodeIdAdded(ancestorNode.id)
+        );
       },
       nodeCheckboxIsDisabled(contentNode) {
         return this.isNodeIdAlreadyAdded(contentNode.id);

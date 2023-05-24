@@ -16,6 +16,7 @@
       <th class="content-node-size-column">
         {{ $tr('sizeHeader') }}
       </th>
+      <th class="content-node-action-column"></th>
     </template>
     <template #tbody>
       <tbody>
@@ -35,6 +36,16 @@
           </template>
         </CollectionSelectionsTableRow>
       </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row" colspan="2">
+            {{ $tr('totalHeader') }}
+          </th>
+          <td class="total-size-column">
+            {{ totalSizeText }}
+          </td>
+        </tr>
+      </tfoot>
     </template>
   </CoreTable>
 
@@ -43,6 +54,7 @@
 
 <script>
 
+  import bytesForHumans from 'kolibri.utils.bytesForHumans';
   import CoreTable from 'kolibri.coreVue.components.CoreTable';
   import CollectionSelectionsTableRow from './CollectionSelectionsTableRow';
 
@@ -59,8 +71,29 @@
       },
     },
     computed: {
+      selectedNodeIds() {
+        return this.selectedNodes.map(contentNode => contentNode.id);
+      },
       selectedNodesByLft() {
         return this.selectedNodes.slice().sort((nodeA, nodeB) => nodeA.lft - nodeB.lft);
+      },
+      totalSize() {
+        return this.selectedNodes.reduce(
+          (total, contentNode) =>
+            this.doesNodeUseExtraSpace(contentNode) ? total : total + contentNode.total_file_size,
+          0
+        );
+      },
+      totalSizeText() {
+        return bytesForHumans(this.totalSize);
+      },
+    },
+    methods: {
+      isNodeIdSelected(nodeId) {
+        return this.selectedNodeIds.indexOf(nodeId) >= 0;
+      },
+      doesNodeUseExtraSpace(contentNode) {
+        return contentNode.ancestors.some(ancestorNode => this.isNodeIdSelected(ancestorNode.id));
       },
     },
     $trs: {
@@ -73,6 +106,9 @@
       sizeHeader: {
         message: 'Size',
       },
+      totalHeader: {
+        message: 'Total:',
+      },
     },
   };
 
@@ -81,8 +117,15 @@
 
 <style lang="scss" scoped>
 
+  @import '~kolibri-design-system/lib/styles/definitions';
+  @import '~kolibri-design-system/lib/keen/styles/imports';
+
   th {
     vertical-align: middle;
+  }
+
+  tfoot {
+    border-top: dashed $ui-input-border-width $disabled-text-color;
   }
 
   .content-node-selected-column {
