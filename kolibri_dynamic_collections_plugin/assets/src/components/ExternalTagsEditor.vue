@@ -1,6 +1,7 @@
 <template>
 
   <div class="external-tags-editor">
+    <span class="label">Tags:</span>
     <KCheckbox
       v-for="tagId in externalTagOptions"
       :key="tagId"
@@ -50,6 +51,7 @@
 
 </script>
 
+
 <style lang="scss" scoped>
 
   .external-tags-editor {
@@ -57,6 +59,10 @@
     flex-direction: row;
     flex-wrap: wrap;
     margin: 0.5em -0.5em -0.25em;
+
+    .label {
+      margin: 0 0.5em;
+    }
 
     .k-checkbox-container {
       margin: 0 0.5em;
