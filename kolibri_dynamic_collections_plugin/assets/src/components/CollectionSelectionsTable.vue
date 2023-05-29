@@ -6,7 +6,7 @@
         <span class="visuallyhidden">
           {{ $tr('selectedHeader') }}
         </span>
-        <slot name="nodeActions" v-bind="buildContentNodeProps(topic)"></slot>
+        <slot name="nodeActions"></slot>
       </th>
       <th class="content-node-title-column">
         <span class="visuallyhidden">
@@ -19,20 +19,18 @@
     </template>
     <template #tbody>
       <tbody>
-        <CollectionContentNodeTableRow
-          v-for="contentNode in children"
+        <CollectionSelectionsTableRow
+          v-for="contentNode in selectedNodesByLft"
           :key="contentNode.id"
           :contentNode="contentNode"
-          :class="{ 'content-node-faded': fadeNodeIds.includes(contentNode.id) }"
-          @navigate="$emit('navigate', { nodeId: contentNode.id })"
         >
           <template #actions>
-            <slot name="nodeActions" v-bind="buildContentNodeProps(contentNode)"></slot>
+            <slot name="nodeActions" v-bind="{ contentNode }"></slot>
           </template>
           <template #extraActions>
-            <slot name="nodeExtraActions" v-bind="buildContentNodeProps(contentNode)"></slot>
+            <slot name="nodeExtraActions" v-bind="{ contentNode }"></slot>
           </template>
-        </CollectionContentNodeTableRow>
+        </CollectionSelectionsTableRow>
       </tbody>
     </template>
   </CoreTable>
@@ -43,33 +41,23 @@
 <script>
 
   import CoreTable from 'kolibri.coreVue.components.CoreTable';
-  import CollectionContentNodeTableRow from './CollectionContentNodeTableRow';
+  import CollectionSelectionsTableRow from './CollectionSelectionsTableRow';
 
   export default {
-    name: 'CollectionContentNodeTable',
+    name: 'CollectionSelectionsTable',
     components: {
+      CollectionSelectionsTableRow,
       CoreTable,
-      CollectionContentNodeTableRow,
     },
     props: {
-      topic: {
-        type: Object,
+      selectedNodes: {
+        type: Array,
         required: true,
       },
-      children: {
-        type: Array,
-        default: () => [],
-      },
-      fadeNodeIds: {
-        type: Array,
-        default: () => [],
-      },
     },
-    methods: {
-      buildContentNodeProps(contentNode) {
-        return {
-          contentNode,
-        };
+    computed: {
+      selectedNodesByLft() {
+        return this.selectedNodes.slice().sort((nodeA, nodeB) => nodeA.lft - nodeB.lft);
       },
     },
     $trs: {
@@ -92,10 +80,6 @@
 
   th {
     vertical-align: middle;
-  }
-
-  .content-node-faded {
-    opacity: 0.8;
   }
 
   .content-node-selected-column {

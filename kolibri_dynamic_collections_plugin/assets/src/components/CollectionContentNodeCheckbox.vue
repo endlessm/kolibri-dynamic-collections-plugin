@@ -2,6 +2,7 @@
 
   <KCheckbox
     :checked="isSelected"
+    :disabled="disabled"
     :indeterminate="isSelectedIndirectly"
     :class="{ 'selected-indirectly': isSelectedIndirectly }"
     :title="$tr('checkboxTooltip')"
@@ -22,6 +23,10 @@
       contentNode: {
         type: Object,
         required: true,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
       },
       isSelected: {
         type: Boolean,
@@ -57,12 +62,3 @@
   };
 
 </script>
-
-
-<style lang="scss" scoped>
-
-  .selected-indirectly {
-    opacity: 0.5;
-  }
-
-</style>

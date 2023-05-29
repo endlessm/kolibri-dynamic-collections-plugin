@@ -1,3 +1,6 @@
+import union from 'lodash/union';
+import without from 'lodash/without';
+
 function defaultState() {
   return {
     collectionMetadata: {},
@@ -139,24 +142,25 @@ export default {
       delete selectedNodeIdsByChannel[channelId];
       store.commit('SET_STATE', { ...store.state, selectedChannels, selectedNodeIdsByChannel });
     },
-    setNodeIncluded(store, { channelId, nodeId, included }) {
+    addSelectedNodes(store, { channelId, nodeIds }) {
       const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
-      const externalTagsByNode = { ...store.state.externalTagsByNode };
 
-      const channelNodeIds = new Set(selectedNodeIdsByChannel[channelId]);
-      if (included) {
-        channelNodeIds.add(nodeId);
-      } else {
-        channelNodeIds.delete(nodeId);
-        delete externalTagsByNode[nodeId];
-      }
-      selectedNodeIdsByChannel[channelId] = Array.from(channelNodeIds);
+      selectedNodeIdsByChannel[channelId] = union(selectedNodeIdsByChannel[channelId], nodeIds);
 
-      store.commit('SET_STATE', { ...store.state, externalTagsByNode, selectedNodeIdsByChannel });
+      store.commit('SET_STATE', { ...store.state, selectedNodeIdsByChannel });
     },
-    setExternalTagsForNode(store, { nodeId, tags }) {
+    removeSelectedNode(store, { channelId, nodeId }) {
+      const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
+
+      selectedNodeIdsByChannel[channelId] = without(selectedNodeIdsByChannel[channelId], nodeId);
+
+      store.commit('SET_STATE', { ...store.state, selectedNodeIdsByChannel });
+    },
+    setExternalTagsForNodes(store, { nodeIds, tagIds }) {
       const externalTagsByNode = { ...store.state.externalTagsByNode };
-      externalTagsByNode[nodeId] = tags.slice().sort();
+      nodeIds.forEach(nodeId => {
+        externalTagsByNode[nodeId] = tagIds.slice().sort();
+      });
       store.commit('SET_STATE', { ...store.state, externalTagsByNode });
     },
   },

@@ -7,18 +7,14 @@
     <td class="content-node-cell">
       <ContentNodeTile
         :contentNode="contentNode"
-      >
-        <template v-if="!contentNode.is_leaf" #nodeTitle>
-          <KButton
-            appearance="basic-link"
-            :text="contentNode.title"
-            :style="{ 'font-weight': 'normal' }"
-            @click="$emit('navigate')"
-          />
-        </template>
-      </ContentNodeTile>
+        :alwaysShowPreviewLink="true"
+        :showBreadcrumbs="true"
+      />
     </td>
     <td>{{ bytesText }}</td>
+    <td class="core-table-button-col">
+      <slot name="extraActions"></slot>
+    </td>
   </tr>
 
 </template>
@@ -30,7 +26,7 @@
   import ContentNodeTile from './ContentNodeTile';
 
   export default {
-    name: 'CollectionContentNodeTableRow',
+    name: 'CollectionSelectionsTableRow',
     components: {
       ContentNodeTile,
     },
@@ -57,9 +53,11 @@
 
     &.action-cell {
       width: 0;
-      padding-top: 16px;
-      vertical-align: top;
     }
+  }
+
+  .core-table-button-col {
+    width: 0;
   }
 
 </style>

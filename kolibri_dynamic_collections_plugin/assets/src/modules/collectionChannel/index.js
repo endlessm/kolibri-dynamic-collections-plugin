@@ -1,9 +1,7 @@
 function defaultState() {
   return {
-    channel: {},
-    topic: {},
-    children: [],
-    selectionRanges: [],
+    channelId: null,
+    cachedNodesDetails: [],
   };
 }
 
@@ -15,14 +13,18 @@ export default {
       Object.assign(state, defaultState());
     },
     SET_STATE(state, payload) {
-      state.channel = payload.channel || {};
-      state.topic = payload.topic || {};
-      state.children = payload.children || [];
+      state.channelId = payload.channelId || null;
+      state.cachedNodesDetails = payload.cachedNodesDetails || [];
     },
   },
   getters: {
     selectedNodeIds(state, getters, rootState) {
-      return rootState.collectionBase.selectedNodeIdsByChannel[state.channel.id] || [];
+      return rootState.collectionBase.selectedNodeIdsByChannel[state.channelId] || [];
+    },
+    selectedNodes(state, getters) {
+      return state.cachedNodesDetails.filter(contentNode =>
+        getters.selectedNodeIds.includes(contentNode.id)
+      );
     },
   },
 };
