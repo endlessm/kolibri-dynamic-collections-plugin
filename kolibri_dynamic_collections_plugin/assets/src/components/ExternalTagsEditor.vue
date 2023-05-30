@@ -1,10 +1,12 @@
 <template>
 
   <div class="external-tags-editor">
+    <span class="label">Tags:</span>
     <KCheckbox
       v-for="tagId in externalTagOptions"
       :key="tagId"
-      :checked="tags.indexOf(tagId) >= 0"
+      :checked="tags.includes(tagId)"
+      :indeterminate="indeterminateTags.includes(tagId)"
       :label="tagId"
       @change="onExternalTagCheckboxToggled(tagId, $event)"
     />
@@ -15,12 +17,7 @@
 
 <script>
 
-  // For now, we hard code a list of external tags that are useful with
-  // Endless Key's Kolibri Explore Plugin.
-  // TODO: Use a tags input with typeahead, similar to
-  //       <https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/>
-
-  const EXTERNAL_TAGS = ['career', 'curious', 'highlight', 'skill'];
+  import { EXTERNAL_TAGS } from '../constants';
 
   export default {
     name: 'ExternalTagsEditor',
@@ -28,6 +25,10 @@
     mixins: [],
     props: {
       tags: {
+        type: Array,
+        default: () => [],
+      },
+      indeterminateTags: {
         type: Array,
         default: () => [],
       },
@@ -50,6 +51,7 @@
 
 </script>
 
+
 <style lang="scss" scoped>
 
   .external-tags-editor {
@@ -57,6 +59,10 @@
     flex-direction: row;
     flex-wrap: wrap;
     margin: 0.5em -0.5em -0.25em;
+
+    .label {
+      margin: 0 0.5em;
+    }
 
     .k-checkbox-container {
       margin: 0 0.5em;

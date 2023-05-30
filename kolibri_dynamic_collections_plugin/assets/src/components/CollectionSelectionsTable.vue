@@ -6,7 +6,7 @@
         <span class="visuallyhidden">
           {{ $tr('selectedHeader') }}
         </span>
-        <slot name="nodeActions"></slot>
+        <slot name="nodeActions" v-bind="{ contentNode: null }"></slot>
       </th>
       <th class="content-node-title-column">
         <span class="visuallyhidden">
@@ -26,6 +26,9 @@
         >
           <template #actions>
             <slot name="nodeActions" v-bind="{ contentNode }"></slot>
+          </template>
+          <template #details>
+            <slot name="nodeDetails" v-bind="{ contentNode }"></slot>
           </template>
           <template #extraActions>
             <slot name="nodeExtraActions" v-bind="{ contentNode }"></slot>

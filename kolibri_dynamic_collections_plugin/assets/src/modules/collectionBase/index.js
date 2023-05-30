@@ -163,5 +163,15 @@ export default {
       });
       store.commit('SET_STATE', { ...store.state, externalTagsByNode });
     },
+    changeExternalTagsForNodes(store, { nodeIds, addTagIds = [], removeTagIds = [] }) {
+      const externalTagsByNode = { ...store.state.externalTagsByNode };
+      nodeIds.forEach(nodeId => {
+        let externalTags = externalTagsByNode[nodeId];
+        externalTags = union(externalTags, addTagIds);
+        externalTags = without(externalTags, ...removeTagIds);
+        externalTagsByNode[nodeId] = externalTags.sort();
+      });
+      store.commit('SET_STATE', { ...store.state, externalTagsByNode });
+    },
   },
 };

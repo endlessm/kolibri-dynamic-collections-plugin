@@ -9,7 +9,11 @@
         :contentNode="contentNode"
         :alwaysShowPreviewLink="true"
         :showBreadcrumbs="true"
-      />
+      >
+        <template #details>
+          <slot name="details"></slot>
+        </template>
+      </ContentNodeTile>
     </td>
     <td>{{ bytesText }}</td>
     <td class="core-table-button-col">
@@ -53,6 +57,8 @@
 
     &.action-cell {
       width: 0;
+      padding-top: 24px;
+      vertical-align: top;
     }
   }
 

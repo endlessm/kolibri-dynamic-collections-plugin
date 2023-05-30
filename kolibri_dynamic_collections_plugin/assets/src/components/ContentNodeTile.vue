@@ -27,6 +27,7 @@
         :contentNode="contentNode"
         class="content-node-preview"
       />
+      <slot name="details"></slot>
     </div>
   </div>
 
@@ -83,9 +84,10 @@
     .content-node-thumbnail {
       flex-grow: 0;
       flex-shrink: 0;
+      align-self: flex-start;
       width: auto;
       height: 2em;
-      margin: 16px 8px;
+      margin: 8px 16px 8px 0;
     }
 
     .content-node-main {
