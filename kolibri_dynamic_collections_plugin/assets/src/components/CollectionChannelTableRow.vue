@@ -7,7 +7,7 @@
         appearance="basic-link"
         class="channel-edit-button"
         icon="library"
-        :text="channel.title"
+        :text="channelName"
         :to="collectionChannelPage"
       />
       <KExternalLink
@@ -15,7 +15,7 @@
         appearance="basic-link"
         class="channel-download-button"
         icon="download"
-        :text="$tr('unknownChannelTitle', { channelId })"
+        :text="channelName"
         :title="$tr('importChannelButtonTooltip')"
         :href="channelImportUrl"
         :openInNewTab="true"
@@ -47,7 +47,14 @@
     },
     computed: {
       channel() {
-        return this.$store.getters['getChannelObject'](this.channelId) || {};
+        return this.$store.getters['getChannelObject'](this.channelId);
+      },
+      channelName() {
+        if (this.channel) {
+          return this.channel.title;
+        } else {
+          return this.$tr('unknownChannelTitle', { channelId: this.channelId });
+        }
       },
       channelImportUrl() {
         // TODO: Instead of navigating to this page, we should run the

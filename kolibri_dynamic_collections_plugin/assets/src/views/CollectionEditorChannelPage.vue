@@ -114,10 +114,14 @@
       ...mapState('collectionChannel', ['channelId']),
       ...mapGetters('collectionChannel', ['selectedNodes']),
       channel() {
-        return this.$store.getters['getChannelObject'](this.channelId) || {};
+        return this.$store.getters['getChannelObject'](this.channelId);
       },
       channelName() {
-        return this.channel.title;
+        if (this.channel) {
+          return this.channel.title;
+        } else {
+          return this.$tr('unknownChannelTitle', { channelId: this.channelId });
+        }
       },
       selectedNodeIds() {
         return this.selectedNodes.map(contentNode => contentNode.id);
@@ -191,6 +195,10 @@
       },
     },
     $trs: {
+      unknownChannelTitle: {
+        message: '({channelId})',
+        context: 'Placeholder title for an unknown channel',
+      },
       addContentButtonLabel: {
         message: 'Add Content',
         context: 'Label for the Add Content button.',
