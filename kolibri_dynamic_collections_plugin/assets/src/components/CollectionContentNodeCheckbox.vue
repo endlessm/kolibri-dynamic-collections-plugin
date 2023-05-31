@@ -3,11 +3,11 @@
   <KCheckbox
     :checked="isSelected"
     :disabled="disabled"
-    :indeterminate="isSelectedIndirectly"
+    :indeterminate="isIndeterminate"
     :class="{ 'selected-indirectly': isSelectedIndirectly }"
     :title="$tr('checkboxTooltip')"
     :style="{ marginTop: 0, marginBottom: 0 }"
-    @change="onNodeCheckboxToggled"
+    @change="$emit('toggle', $event)"
   />
 
 </template>
@@ -20,15 +20,15 @@
     components: {},
     mixins: [],
     props: {
-      contentNode: {
-        type: Object,
-        required: true,
-      },
       disabled: {
         type: Boolean,
         default: false,
       },
       isSelected: {
+        type: Boolean,
+        default: false,
+      },
+      isDescendantSelected: {
         type: Boolean,
         default: false,
       },
@@ -38,16 +38,11 @@
       },
     },
     computed: {
-      isSelectedIndirectly() {
-        return this.isAncestorSelected && !this.isSelected;
+      isIndeterminate() {
+        return !this.isSelected && (this.isDescendantSelected || this.isAncestorSelected);
       },
-    },
-    methods: {
-      onNodeCheckboxToggled(value) {
-        this.$emit('toggle', {
-          contentNode: this.contentNode,
-          included: value,
-        });
+      isSelectedIndirectly() {
+        return this.isIndeterminate && !this.isDescendantSelected;
       },
     },
     $trs: {
@@ -59,3 +54,12 @@
   };
 
 </script>
+
+
+<style lang="scss" scoped>
+
+  .selected-indirectly {
+    opacity: 0.5;
+  }
+
+</style>

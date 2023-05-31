@@ -23,8 +23,9 @@
             :contentNode="contentNode"
             :disabled="nodeCheckboxIsDisabled(contentNode)"
             :isSelected="nodeCheckboxIsSelected(contentNode)"
+            :isDescendantSelected="nodeCheckboxIsDescendantSelected(contentNode)"
             :isAncestorSelected="nodeCheckboxIsAncestorSelected(contentNode)"
-            @toggle="onContentNodeCheckboxToggle"
+            @toggle="onContentNodeCheckboxToggle(contentNode, $event)"
           />
         </template>
       </CollectionContentNodeTable>
@@ -143,7 +144,7 @@
       onContentNodeNavigate({ nodeId }) {
         this.$router.push(this.getTopicRoute(nodeId));
       },
-      onContentNodeCheckboxToggle({ contentNode, included }) {
+      onContentNodeCheckboxToggle(contentNode, included) {
         const addContentNodes = { ...this.addContentNodes };
 
         if (included) {
@@ -190,6 +191,12 @@
       },
       nodeCheckboxIsSelected(contentNode) {
         return this.isNodeIdAlreadyAdded(contentNode.id) || this.isNodeIdAdded(contentNode.id);
+      },
+      nodeCheckboxIsDescendantSelected(contentNode) {
+        return contentNode.descendant_node_ids.some(
+          descendantNodeId =>
+            this.isNodeIdAlreadyAdded(descendantNodeId) || this.isNodeIdAdded(descendantNodeId)
+        );
       },
       nodeCheckboxIsAncestorSelected(contentNode) {
         return contentNode.ancestors.some(
