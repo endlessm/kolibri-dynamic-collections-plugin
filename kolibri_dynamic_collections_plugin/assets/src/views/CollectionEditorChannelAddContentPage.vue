@@ -57,6 +57,7 @@
   import union from 'lodash/union';
   import without from 'lodash/without';
   import { mapActions, mapGetters, mapState } from 'vuex';
+  import bytesForHumans from 'kolibri.utils.bytesForHumans';
   import commonCoreStrings from 'kolibri.coreVue.mixins.commonCoreStrings';
   import BottomAppBar from 'kolibri.coreVue.components.BottomAppBar';
   import CoreBase from 'kolibri.coreVue.components.CoreBase';
@@ -77,7 +78,7 @@
     mixins: [commonCoreStrings],
     data() {
       return {
-        addNodeIds: [],
+        addContentNodes: {},
         quickTags: [],
       };
     },
@@ -105,11 +106,22 @@
         ];
         return result;
       },
+      addNodeIds() {
+        return Object.values(this.addContentNodes).map(contentNode => contentNode.id);
+      },
+      selectionSize() {
+        return Object.values(this.addContentNodes).reduce(
+          (total, contentNode) =>
+            this.doesNodeUseExtraSpace(contentNode) ? total : total + contentNode.total_file_size,
+          0
+        );
+      },
+      selectionSizeText() {
+        return bytesForHumans(this.selectionSize);
+      },
       selectionSummaryText() {
-        // TODO: Can we include a rough count here?
-        //       Maybe break down number of topic and content nodes?
         const count = this.addNodeIds.length;
-        return this.$tr('selectionSummaryText', { count });
+        return this.$tr('selectionSummaryText', { count, size: this.selectionSizeText });
       },
     },
     methods: {
@@ -131,12 +143,16 @@
       onContentNodeNavigate({ nodeId }) {
         this.$router.push(this.getTopicRoute(nodeId));
       },
-      onContentNodeCheckboxToggle({ nodeId, included }) {
+      onContentNodeCheckboxToggle({ contentNode, included }) {
+        const addContentNodes = { ...this.addContentNodes };
+
         if (included) {
-          this.addNodeIds = union(this.addNodeIds, [nodeId]);
+          addContentNodes[contentNode.id] = contentNode;
         } else {
-          this.addNodeIds = without(this.addNodeIds, nodeId);
+          delete addContentNodes[contentNode.id];
         }
+
+        this.addContentNodes = addContentNodes;
       },
       onQuickTagAdd({ tagId }) {
         this.quickTags = union(this.quickTags, [tagId]);
@@ -163,6 +179,12 @@
       isNodeIdAdded(nodeId) {
         return this.addNodeIds.indexOf(nodeId) >= 0;
       },
+      doesNodeUseExtraSpace(contentNode) {
+        return contentNode.ancestors.some(
+          ancestorNode =>
+            this.isNodeIdAlreadyAdded(ancestorNode.id) || this.isNodeIdAdded(ancestorNode.id)
+        );
+      },
       nodeCheckboxIsDisabled(contentNode) {
         return this.isNodeIdAlreadyAdded(contentNode.id);
       },
@@ -186,8 +208,9 @@
         context: 'Label for the submit button',
       },
       selectionSummaryText: {
-        message: '{count, number} {count, plural, one {node selected} other {nodes selected}}',
-        context: 'Label identifying the number of nodes that are being added',
+        message:
+          '{count, number} {count, plural, one {item selected} other {items selected}} ({size})',
+        context: 'Label identifying the number of items that are being added',
       },
     },
   };
