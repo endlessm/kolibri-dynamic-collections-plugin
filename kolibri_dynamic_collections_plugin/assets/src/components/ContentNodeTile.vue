@@ -135,7 +135,7 @@
       align-self: flex-start;
       width: auto;
       height: 2em;
-      margin: 8px 16px 8px 0;
+      margin: 0 16px 0 -4px;
     }
 
     .content-node-main {

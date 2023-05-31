@@ -57,7 +57,7 @@
 
     &.action-cell {
       width: 0;
-      padding-top: 24px;
+      padding-top: 16px;
       vertical-align: top;
     }
   }
