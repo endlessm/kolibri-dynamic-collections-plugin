@@ -36,6 +36,7 @@ export default [
     handler(toRoute) {
       const { channelId, topicId } = toRoute.params;
       showLoading(store, PageNames.COLLECTION_EDITOR_CHANNEL_ADD_CONTENT)
+        .then(() => showCollectionChannel(store, { channelId }))
         .then(() => showChannelBrowser(store, { channelId, topicId }))
         .finally(() => clearLoading(store));
     },
