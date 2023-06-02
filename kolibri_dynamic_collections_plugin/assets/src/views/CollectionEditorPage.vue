@@ -23,7 +23,7 @@
         <template #actions>
           <CollectionEditorOptionsMenu
             @exportOptionSelect="exportCollectionEditorData"
-            @resetOptionSelect="resetCollectionEditorState"
+            @resetOptionSelect="onResetOptionSelect"
           />
         </template>
       </EditorPageHeader>
@@ -157,6 +157,11 @@
         }
         this.setCollectionEditorDataFromFile({ file });
       },
+      onResetOptionSelect() {
+        if (window.confirm(this.$tr('resetConfirmMessage'))) {
+          this.resetCollectionEditorState();
+        }
+      },
     },
     $trs: {
       channelsSectionTitle: {
@@ -190,6 +195,10 @@
       renameButtonLabel: {
         message: 'Rename',
         context: 'Label for the Rename button.',
+      },
+      resetConfirmMessage: {
+        message: 'Would you like to reset the editor?',
+        context: 'Sanity check for the Reset menu option',
       },
     },
   };
