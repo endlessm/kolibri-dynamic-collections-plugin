@@ -30,7 +30,7 @@
 
 <script>
 
-  import {EXTERNAL_TAGS} from '../constants';
+  import {CHANNEL_EXTERNAL_TAGS, NODE_EXTERNAL_TAGS} from '../constants';
 
   /* TODO: With Kolibri 0.16, use a KIconButton with a KDropdownMenu for the "Add" menu */
 
@@ -44,7 +44,11 @@
     },
     computed: {
       allTagIds() {
-        return [...EXTERNAL_TAGS];
+        if (this.showChannelTags) {
+          return [...CHANNEL_EXTERNAL_TAGS, ...NODE_EXTERNAL_TAGS]
+        } else {
+          return [...NODE_EXTERNAL_TAGS];
+        }
       },
       selectedTagIds() {
         return this.allTagIds.filter(

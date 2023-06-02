@@ -10,4 +10,5 @@ export const PageNames = {
 // TODO: Use a tags input with typeahead, similar to
 //       <https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/>
 
-export const EXTERNAL_TAGS = ['career', 'curious', 'highlight', 'skill'];
+export const NODE_EXTERNAL_TAGS = ['career', 'curious', 'highlight', 'skill'];
+export const CHANNEL_EXTERNAL_TAGS = ['featured-channel'];

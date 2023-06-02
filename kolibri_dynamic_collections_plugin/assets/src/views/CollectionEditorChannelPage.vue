@@ -13,6 +13,7 @@
         <template #subtitle>
           <TagsListEditor
             :tags="externalTagsByNode[channelId]"
+            :showChannelTags="true"
             @add="onTagsListEditorAdd(channelId, $event)"
             @remove="onTagsListEditorRemove(channelId, $event)"
           />
@@ -56,6 +57,7 @@
           <div class="node-details">
             <TagsListEditor
               :tags="externalTagsByNode[contentNode.id]"
+              :showChannelTags="contentNode.id === channelId"
               @add="onTagsListEditorAdd(contentNode.id, $event)"
               @remove="onTagsListEditorRemove(contentNode.id, $event)"
             />
