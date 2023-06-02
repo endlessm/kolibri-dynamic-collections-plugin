@@ -1,11 +1,10 @@
 <template>
 
-  <div class="editor-page-header">
-    <div class="page-title">
-      <h1>{{ title }}</h1>
-      <slot name="subtitle"></slot>
+  <div class="editor-section-header">
+    <div class="section-title">
+      <h2>{{ title }}</h2>
     </div>
-    <div class="page-actions">
+    <div class="section-actions">
       <slot name="actions"></slot>
     </div>
   </div>
@@ -16,7 +15,7 @@
 <script>
 
   export default {
-    name: 'EditorPageHeader',
+    name: 'EditorSectionHeader',
     props: {
       title: {
         type: String,
@@ -30,26 +29,28 @@
 
 <style lang="scss" scoped>
 
-  .editor-page-header {
+  .editor-section-header {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    row-gap: 0.5em;
     column-gap: 2em;
-    margin-bottom: 1.6em;
+    align-items: flex-end;
+    margin: 1em 0;
   }
 
-  .page-title {
+  .section-title {
     flex-basis: 50%;
     flex-grow: 1;
 
-    h1 {
-      margin-bottom: 0.2em;
+    h2 {
+      margin: 0;
     }
   }
 
-  .page-actions {
+  .section-actions {
     flex-shrink: 0;
-    margin-top: 1.2em;
+    margin-top: 0.5em;
     text-align: right;
   }
 

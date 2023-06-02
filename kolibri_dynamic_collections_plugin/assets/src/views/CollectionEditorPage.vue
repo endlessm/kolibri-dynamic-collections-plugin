@@ -21,20 +21,23 @@
           />
         </template>
         <template #actions>
-          <KButtonGroup>
-            <CollectionEditorOptionsMenu
-              @exportOptionSelect="exportCollectionEditorData"
-              @resetOptionSelect="resetCollectionEditorState"
-            />
-            <KButton
-              :text="$tr('addChannelButtonLabel')"
-              :primary="true"
-              :style="{ marginLeft: 0 }"
-              @click="showAddChannelModal = true"
-            />
-          </KButtonGroup>
+          <CollectionEditorOptionsMenu
+            @exportOptionSelect="exportCollectionEditorData"
+            @resetOptionSelect="resetCollectionEditorState"
+          />
         </template>
       </EditorPageHeader>
+
+      <EditorSectionHeader :title="$tr('channelsSectionTitle')">
+        <template #actions>
+          <KButton
+            :text="$tr('addChannelButtonLabel')"
+            :primary="true"
+            :style="{ marginLeft: 0 }"
+            @click="showAddChannelModal = true"
+          />
+        </template>
+      </EditorSectionHeader>
 
       <CollectionChannelTable
         v-if="selectedChannelIds.length > 0"
@@ -94,6 +97,7 @@
   import EditorPageHeader from '../components/EditorPageHeader';
   import CollectionEditorOptionsMenu from '../components/CollectionEditorOptionsMenu';
   import EditCollectionMetadataModal from '../components/EditCollectionMetadataModal';
+  import EditorSectionHeader from '../components/EditorSectionHeader';
 
   export default {
     name: 'CollectionEditorPage',
@@ -104,6 +108,7 @@
       CollectionEditorOptionsMenu,
       EditorPageHeader,
       EditCollectionMetadataModal,
+      EditorSectionHeader,
     },
     data() {
       return {
@@ -154,6 +159,10 @@
       },
     },
     $trs: {
+      channelsSectionTitle: {
+        message: 'Channels',
+        context: 'Title of the Channels table',
+      },
       addChannelButtonLabel: {
         message: 'Add Channel',
         context: 'Label for the Add Channel button.',
@@ -192,12 +201,6 @@
 
   @import '~kolibri-design-system/lib/styles/definitions';
   @import '~kolibri-design-system/lib/keen/styles/imports';
-
-  .channels-table,
-  .empty-collection-form {
-    /* 24px is a magic number used for ".move-down" in some Kolibri core plugins */
-    margin-top: 24px;
-  }
 
   .empty-collection-form {
     border-top: solid $ui-input-border-width $ui-input-border-color;

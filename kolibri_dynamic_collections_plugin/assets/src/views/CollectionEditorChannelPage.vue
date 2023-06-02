@@ -9,18 +9,18 @@
     :showSubNav="false"
   >
     <KPageContainer>
-      <EditorPageHeader :title="$tr('collectionChannelHeader', { channelName })">
+      <EditorPageHeader :title="$tr('collectionChannelHeader', { channelName })" />
+
+      <EditorSectionHeader title="Selected Content">
         <template #actions>
-          <KButtonGroup>
-            <KButton
-              :text="$tr('addContentButtonLabel')"
-              :primary="true"
-              :style="{ marginLeft: 0 }"
-              @click="$router.push(addContentRoute)"
-            />
-          </KButtonGroup>
+          <KButton
+            :text="$tr('addContentButtonLabel')"
+            :primary="true"
+            :style="{ marginLeft: 0 }"
+            @click="$router.push(addContentRoute)"
+          />
         </template>
-      </EditorPageHeader>
+      </EditorSectionHeader>
 
       <CollectionSelectionsTable
         v-if="selectedNodes.length > 0"
@@ -93,6 +93,7 @@
   import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
   import EditorPageHeader from '../components/EditorPageHeader';
   import ExternalTagsList from '../components/ExternalTagsList';
+  import EditorSectionHeader from '../components/EditorSectionHeader';
 
   export default {
     name: 'CollectionEditorChannelPage',
@@ -103,6 +104,7 @@
       CollectionSelectionsTable,
       EditorPageHeader,
       ExternalTagsList,
+      EditorSectionHeader,
     },
     data() {
       return {
