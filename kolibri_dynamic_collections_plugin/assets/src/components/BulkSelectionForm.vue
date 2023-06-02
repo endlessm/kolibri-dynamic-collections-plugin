@@ -2,12 +2,12 @@
 
   <div>
     <div class="form-content">
-      <ExternalTagsEditor
+      <TagsCheckboxEditor
         class="external-tags-editor"
         :tags="tagsEditorTagIds"
         :indeterminateTags="tagsEditorIndeterminateTagIds"
-        @add="onExternalTagsEditorAdd"
-        @remove="onExternalTagsEditorRemove"
+        @add="onTagsCheckboxEditorAdd"
+        @remove="onTagsCheckboxEditorRemove"
       />
     </div>
     <KButtonGroup>
@@ -31,12 +31,12 @@
 <script>
 
   import pickBy from 'lodash/pickBy';
-  import ExternalTagsEditor from '../components/ExternalTagsEditor';
+  import TagsCheckboxEditor from '../components/TagsCheckboxEditor';
 
   export default {
     name: 'BulkSelectionForm',
     components: {
-      ExternalTagsEditor,
+      TagsCheckboxEditor,
     },
     props: {
       defaultTags: {
@@ -84,12 +84,12 @@
         });
         this.reset();
       },
-      onExternalTagsEditorAdd({ tagId }) {
+      onTagsCheckboxEditorAdd({ tagId }) {
         this.changedTags = Object.assign({}, this.changedTags, {
           [tagId]: true,
         });
       },
-      onExternalTagsEditorRemove({ tagId }) {
+      onTagsCheckboxEditorRemove({ tagId }) {
         this.changedTags = Object.assign({}, this.changedTags, {
           [tagId]: false,
         });

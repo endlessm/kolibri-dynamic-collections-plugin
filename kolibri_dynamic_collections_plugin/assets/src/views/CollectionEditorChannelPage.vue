@@ -46,10 +46,10 @@
         </template>
         <template #nodeDetails="{ contentNode }">
           <div class="node-details">
-            <ExternalTagsList
+            <TagsListEditor
               :tags="externalTagsByNode[contentNode.id]"
-              @add="onExternalTagsListAdd(contentNode.id, $event)"
-              @remove="onExternalTagsListRemove(contentNode.id, $event)"
+              @add="onTagsListEditorAdd(contentNode.id, $event)"
+              @remove="onTagsListEditorRemove(contentNode.id, $event)"
             />
           </div>
         </template>
@@ -92,7 +92,7 @@
   import BulkSelectionForm from '../components/BulkSelectionForm';
   import CollectionSelectionsTable from '../components/CollectionSelectionsTable';
   import EditorPageHeader from '../components/EditorPageHeader';
-  import ExternalTagsList from '../components/ExternalTagsList';
+  import TagsListEditor from '../components/TagsListEditor';
   import EditorSectionHeader from '../components/EditorSectionHeader';
 
   export default {
@@ -103,7 +103,7 @@
       BulkSelectionForm,
       CollectionSelectionsTable,
       EditorPageHeader,
-      ExternalTagsList,
+      TagsListEditor,
       EditorSectionHeader,
     },
     data() {
@@ -189,10 +189,10 @@
         this.removeBulkEditNode(contentNode);
         this.removeSelectedNode({ channelId: this.channelId, nodeId: contentNode.id });
       },
-      onExternalTagsListAdd(nodeId, { tagId }) {
+      onTagsListEditorAdd(nodeId, { tagId }) {
         this.changeExternalTagsForNodes({ nodeIds: [nodeId], addTagIds: [tagId] });
       },
-      onExternalTagsListRemove(nodeId, { tagId }) {
+      onTagsListEditorRemove(nodeId, { tagId }) {
         this.changeExternalTagsForNodes({ nodeIds: [nodeId], removeTagIds: [tagId] });
       },
     },
