@@ -10,12 +10,19 @@
         @remove="onExternalTagsEditorRemove"
       />
     </div>
-    <KButton
-      :text="$tr('applyButtonLabel')"
-      :primary="true"
-      :disabled="false"
-      @click="onApplyButtonClick"
-    />
+    <KButtonGroup>
+      <KButton
+        :text="$tr('resetButtonLabel')"
+        :disabled="!hasChangedTags"
+        @click="onResetButtonClick"
+      />
+      <KButton
+        :text="$tr('applyButtonLabel')"
+        :primary="true"
+        :disabled="false"
+        @click="onApplyButtonClick"
+      />
+    </KButtonGroup>
   </div>
 
 </template>
@@ -53,6 +60,9 @@
       tagsEditorIndeterminateTagIds() {
         return Object.keys(pickBy(this.currentTags, value => value === null));
       },
+      hasChangedTags() {
+        return this.addTagIds.length > 0 || this.removeTagIds.length > 0;
+      },
       addTagIds() {
         return Object.keys(pickBy(this.changedTags, value => value === true));
       },
@@ -62,7 +72,10 @@
     },
     methods: {
       reset() {
-        this.currentTags = {};
+        this.changedTags = {};
+      },
+      onResetButtonClick() {
+        this.reset();
       },
       onApplyButtonClick() {
         this.$emit('submit', {
@@ -86,6 +99,10 @@
       applyButtonLabel: {
         message: 'Apply',
         context: 'Label for the bulk action Apply button.',
+      },
+      resetButtonLabel: {
+        message: 'Reset',
+        context: 'Label for the Reset button.',
       },
     },
   };
