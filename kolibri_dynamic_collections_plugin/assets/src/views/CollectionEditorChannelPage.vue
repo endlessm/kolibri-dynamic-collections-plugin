@@ -9,7 +9,15 @@
     :showSubNav="false"
   >
     <KPageContainer>
-      <EditorPageHeader :title="$tr('collectionChannelHeader', { channelName })" />
+      <EditorPageHeader :title="$tr('collectionChannelHeader', { channelName })">
+        <template #subtitle>
+          <TagsListEditor
+            :tags="externalTagsByNode[channelId]"
+            @add="onTagsListEditorAdd(channelId, $event)"
+            @remove="onTagsListEditorRemove(channelId, $event)"
+          />
+        </template>
+      </EditorPageHeader>
 
       <EditorSectionHeader title="Selected Content">
         <template #actions>

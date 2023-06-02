@@ -3,7 +3,7 @@
   <div class="external-tags-editor">
     <span class="label">Tags:</span>
     <KCheckbox
-      v-for="tagId in externalTagOptions"
+      v-for="tagId in allTagIds"
       :key="tagId"
       :checked="tags.includes(tagId)"
       :indeterminate="indeterminateTags.includes(tagId)"
@@ -17,10 +17,10 @@
 
 <script>
 
-  import { EXTERNAL_TAGS } from '../constants';
+  import {NODE_EXTERNAL_TAGS} from '../constants';
 
   export default {
-    name: 'ExternalTagsEditor',
+    name: 'TagsCheckboxEditor',
     components: {},
     mixins: [],
     props: {
@@ -34,8 +34,8 @@
       },
     },
     computed: {
-      externalTagOptions() {
-        return EXTERNAL_TAGS;
+      allTagIds() {
+        return [...NODE_EXTERNAL_TAGS];
       },
     },
     methods: {

@@ -4,7 +4,7 @@
     <span class="tags-label">{{ $tr('tagsLabel') }}</span>
     <span v-if="tags.length === 0" class="no-tags-label">{{ $tr('noTagsLabel') }}</span>
     <KButton
-      v-for="tagId in tags"
+      v-for="tagId in selectedTagIds"
       v-else
       :key="tagId"
       class="tag-button"
@@ -18,6 +18,7 @@
       appearance="flat-button"
       class="add-tag-button"
       text="+"
+      ref="addTagButton"
       :options="dropdownOptions"
       :title="$tr('addTooltip')"
       @select="onOptionsDropdownSelect"
@@ -29,12 +30,12 @@
 
 <script>
 
-  import { EXTERNAL_TAGS } from '../constants';
+  import {EXTERNAL_TAGS} from '../constants';
 
   /* TODO: With Kolibri 0.16, use a KIconButton with a KDropdownMenu for the "Add" menu */
 
   export default {
-    name: 'ExternalTagsList',
+    name: 'TagsListEditor',
     props: {
       tags: {
         type: Array,
@@ -42,11 +43,26 @@
       },
     },
     computed: {
+      allTagIds() {
+        return [...EXTERNAL_TAGS];
+      },
+      selectedTagIds() {
+        return this.allTagIds.filter(
+          tagId => this.tags.includes(tagId)
+        );
+      },
+      deselectedTagIds() {
+        return this.allTagIds.filter(
+          tagId => !this.tags.includes(tagId)
+        );
+      },
       dropdownOptions() {
-        return EXTERNAL_TAGS.filter(tagId => !this.tags.includes(tagId)).map(tagId => ({
-          label: tagId,
-          value: tagId,
-        }));
+        return this.deselectedTagIds.map(
+          tagId => ({
+            label: tagId,
+            value: tagId,
+          })
+        );
       },
     },
     methods: {
