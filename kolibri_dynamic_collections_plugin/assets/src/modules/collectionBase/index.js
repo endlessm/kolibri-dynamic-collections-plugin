@@ -141,6 +141,7 @@ export default {
       const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
       const channelNodeIds = selectedNodeIdsByChannel[channelId] || [];
 
+      delete externalTagsByNode[channelId];
       for (const nodeId of channelNodeIds) {
         delete externalTagsByNode[nodeId];
       }
@@ -165,7 +166,9 @@ export default {
       const externalTagsByNode = { ...store.state.externalTagsByNode };
       const selectedNodeIdsByChannel = { ...store.state.selectedNodeIdsByChannel };
 
-      delete externalTagsByNode[nodeId];
+      if (nodeId !== channelId) {
+        delete externalTagsByNode[nodeId];
+      }
       selectedNodeIdsByChannel[channelId] = without(selectedNodeIdsByChannel[channelId], nodeId);
 
       store.commit('SET_STATE', { ...store.state, externalTagsByNode, selectedNodeIdsByChannel });
