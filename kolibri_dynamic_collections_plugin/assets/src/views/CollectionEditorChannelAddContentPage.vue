@@ -32,7 +32,7 @@
 
       <BottomAppBar>
         <div class="quick-tags-editor">
-          <ExternalTagsEditor
+          <TagsCheckboxEditor
             v-if="addNodeIds.length > 0"
             :tags="quickTags"
             @add="onQuickTagAdd"
@@ -65,7 +65,7 @@
   import { PageNames } from '../constants';
   import CollectionContentNodeCheckbox from '../components/CollectionContentNodeCheckbox';
   import CollectionContentNodeTable from '../components/CollectionContentNodeTable';
-  import ExternalTagsEditor from '../components/ExternalTagsEditor';
+  import TagsCheckboxEditor from '../components/TagsCheckboxEditor';
 
   export default {
     name: 'CollectionEditorChannelAddContentPage',
@@ -74,7 +74,7 @@
       CollectionContentNodeCheckbox,
       CollectionContentNodeTable,
       CoreBase,
-      ExternalTagsEditor,
+      TagsCheckboxEditor,
     },
     mixins: [commonCoreStrings],
     data() {
