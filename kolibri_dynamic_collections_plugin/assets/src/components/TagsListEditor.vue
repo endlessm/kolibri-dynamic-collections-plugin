@@ -15,10 +15,10 @@
     />
     <KDropdownMenu
       v-if="dropdownOptions.length > 0"
+      ref="addTagButton"
       appearance="flat-button"
       class="add-tag-button"
       text="+"
-      ref="addTagButton"
       :options="dropdownOptions"
       :title="$tr('addTooltip')"
       @select="onOptionsDropdownSelect"
@@ -30,7 +30,7 @@
 
 <script>
 
-  import {CHANNEL_EXTERNAL_TAGS, NODE_EXTERNAL_TAGS} from '../constants';
+  import { CHANNEL_EXTERNAL_TAGS, NODE_EXTERNAL_TAGS } from '../constants';
 
   /* TODO: With Kolibri 0.16, use a KIconButton with a KDropdownMenu for the "Add" menu */
 
@@ -41,32 +41,30 @@
         type: Array,
         default: () => [],
       },
+      showChannelTags: {
+        type: Boolean,
+        default: false,
+      },
     },
     computed: {
       allTagIds() {
         if (this.showChannelTags) {
-          return [...CHANNEL_EXTERNAL_TAGS, ...NODE_EXTERNAL_TAGS]
+          return [...CHANNEL_EXTERNAL_TAGS, ...NODE_EXTERNAL_TAGS];
         } else {
           return [...NODE_EXTERNAL_TAGS];
         }
       },
       selectedTagIds() {
-        return this.allTagIds.filter(
-          tagId => this.tags.includes(tagId)
-        );
+        return this.allTagIds.filter(tagId => this.tags.includes(tagId));
       },
       deselectedTagIds() {
-        return this.allTagIds.filter(
-          tagId => !this.tags.includes(tagId)
-        );
+        return this.allTagIds.filter(tagId => !this.tags.includes(tagId));
       },
       dropdownOptions() {
-        return this.deselectedTagIds.map(
-          tagId => ({
-            label: tagId,
-            value: tagId,
-          })
-        );
+        return this.deselectedTagIds.map(tagId => ({
+          label: tagId,
+          value: tagId,
+        }));
       },
     },
     methods: {

@@ -17,7 +17,7 @@
 
 <script>
 
-  import {NODE_EXTERNAL_TAGS} from '../constants';
+  import { NODE_EXTERNAL_TAGS } from '../constants';
 
   export default {
     name: 'TagsCheckboxEditor',
